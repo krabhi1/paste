@@ -1,0 +1,4 @@
+import type { Route } from "./+types/search";
+export default function Page({}: Route.ComponentProps): React.ReactNode {
+  return <div>Search Page</div>;
+}
