@@ -1,6 +1,6 @@
 # paste
 
-A simple pastebin service built with clouflare and turso database.
+A fast, minimal, and privacy‑friendly pastebin for sharing text or code. Built with React Router v7 (previously Remix) in Fullstack mode, Turso (SQLite at the edge), and Drizzle ORM.
 
 ## Features
 
