@@ -8,6 +8,6 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function action({ request, context }: Route.ActionArgs) {}
 export function loader({}: Route.LoaderArgs) {}
-export default function Page({}: Route.ComponentProps): React.ReactNode {
+export default function Page({}: Route.ComponentProps) {
   return null;
 }
