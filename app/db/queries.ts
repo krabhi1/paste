@@ -12,7 +12,9 @@ export async function createPaste(args: Pick<Paste, "text" | "title">) {
         .values({
           ...args,
           id,
-        });
+        })
+        .returning();
+      return paste[0];
       success = true;
     } catch (e) {
       if (
@@ -24,6 +26,7 @@ export async function createPaste(args: Pick<Paste, "text" | "title">) {
       throw e;
     }
   }
+  throw new Error("Failed to create paste");
 }
 
 export async function getPaste(id: string) {
@@ -45,7 +48,7 @@ export async function getLatestPastes(limit: number) {
   return pastesList;
 }
 
-export async function getPastesByPage(page: number, limit: number) {
+export async function getLatestPastesByPage(page: number, limit: number) {
   const pastesList = await db()
     .select()
     .from(pastes)

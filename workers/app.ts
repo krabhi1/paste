@@ -1,6 +1,6 @@
 import { createRequestHandler } from "react-router";
 import { drizzle } from "drizzle-orm/libsql";
-import  { type Db,setDb } from "~/db";
+import { type Db, setDb } from "~/db";
 
 declare module "react-router" {
   export interface AppLoadContext {
