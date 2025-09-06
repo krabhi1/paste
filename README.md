@@ -1,79 +1,30 @@
-# Welcome to React Router!
+# paste
 
-A modern, production-ready template for building full-stack React applications using React Router.
+A simple pastebin service built with clouflare and turso database.
 
 ## Features
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+### Core Features
 
-## Getting Started
+- [x] Create and share text snippets easily.
+- [ ] Expiration time for pastes.
+- [ ] Syntax highlighting for various programming languages.
+- [ ] Search functionality to find pastes by keywords
 
-### Installation
+### User Experience
 
-Install the dependencies:
+- [ ] Dark mode for better readability in low light conditions.
+- [ ] Mobile-friendly design for easy access on smartphones and tablets.
+- [ ] Markdown support for formatting text.
 
-```bash
-npm install
-```
+### Security & Management
 
-### Development
+- [ ] User authentication and profile management.
+- [ ] Private pastes that can only be accessed with a password and end-to-end encryption.
+- [ ] Rate limiting to prevent abuse.
 
-Start the development server with HMR:
+### Future Enhancements
 
-```bash
-npm run dev
-```
-
-Your application will be available at `http://localhost:5173`.
-
-## Previewing the Production Build
-
-Preview the production build locally:
-
-```bash
-npm run preview
-```
-
-## Building for Production
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-## Deployment
-
-Deployment is done using the Wrangler CLI.
-
-To build and deploy directly to production:
-
-```sh
-npm run deploy
-```
-
-To deploy a preview URL:
-
-```sh
-npx wrangler versions upload
-```
-
-You can then promote a version to production after verification or roll it out progressively.
-
-```sh
-npx wrangler versions deploy
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+- [ ] API access for programmatic paste creation and retrieval.
+- [ ] Like/dislike system for pastes.
+- [ ] Burn after-read feature for sensitive information.
