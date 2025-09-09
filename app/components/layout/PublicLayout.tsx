@@ -39,7 +39,6 @@ function PublicList({ list }: { list: Paste[] }) {
       (now.getTime() - date.getTime()) / (1000 * 60)
     );
 
-    // Handle future dates
     if (diffInMinutes < 0) diffInMinutes = 0;
 
     if (diffInMinutes < 1) return "Just now";
