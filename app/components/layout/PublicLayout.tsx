@@ -3,11 +3,9 @@ import { Outlet } from "react-router";
 
 export default function PublicLayout() {
   return (
-    <Flex height={"100%"} className="box">
-      <Box flexGrow={"1"}>
-        <Outlet />
-      </Box>
-      <Flex width={"200px"} className="box">
+    <Flex flexGrow="1" style={{ minHeight: 0 }}>
+      <Outlet />
+      <Flex width="200px" flexShrink={"0"}>
         Public
       </Flex>
     </Flex>

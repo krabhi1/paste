@@ -4,7 +4,7 @@ import { type Db, setDb } from "~/db";
 import {
   createPaste,
   getLatestPastes,
-  getPaste,
+  getPasteById,
   searchPastes,
 } from "./queries";
 import { env } from "cloudflare:test";
@@ -37,14 +37,14 @@ describe("Database Queries", () => {
       text: "Hello, World!",
       title: "Test Paste",
     });
-    const fetchedPaste = await getPaste(newPaste.id);
+    const fetchedPaste = await getPasteById(newPaste.id);
     expect(fetchedPaste).not.toBeNull();
     expect(fetchedPaste?.id).toBe(newPaste.id);
     expect(fetchedPaste?.text).toBe("Hello, World!");
     expect(fetchedPaste?.title).toBe("Test Paste");
   });
   test("Get Paste by Invalid ID", async () => {
-    const fetchedPaste = await getPaste("invalid-id");
+    const fetchedPaste = await getPasteById("invalid-id");
     expect(fetchedPaste).toBeNull();
   });
   // get latest pastes

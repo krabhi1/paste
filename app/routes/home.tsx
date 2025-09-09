@@ -1,12 +1,29 @@
 import type { Route } from ".react-router/types/app/routes/+types/home";
-import { Box, Flex, Text as Label } from "@radix-ui/themes"; // Added Label import
-import { Outlet } from "react-router";
+import { Box, Flex, Text as Label, Spinner } from "@radix-ui/themes"; // Added Label import
+import { Outlet, redirect, useFetcher } from "react-router";
 import { Form } from "react-router";
 import { TextField, Select, TextArea, Button } from "@radix-ui/themes"; // Assuming Radix Themes for consistency
+import { createPaste } from "~/db/queries";
+import { sleep } from "~/lib/utils";
 
-// ...existing code...
+export async function action({ request }: Route.ActionArgs) {
+  const formData = await request.formData();
+  const title = formData.get("title") as string;
+  const text = formData.get("text") as string;
+  const syntax = formData.get("syntax") as string;
+  const expiry = formData.get("expiry") as string;
+  await sleep(2000);
+
+  // TODO: add validation
+  const paste = await createPaste({ title, text });
+  console.log("Created paste:", paste);
+  return redirect(`/${paste.id}`);
+}
 
 export default function Page({}: Route.ComponentProps) {
+  const fetcher = useFetcher();
+  const isSubmitting = fetcher.state === "submitting";
+
   return (
     <Flex
       width="100%"
@@ -54,7 +71,7 @@ export default function Page({}: Route.ComponentProps) {
             border: "1px solid var(--gray-6)",
           }}
         >
-          <Form method="post">
+          <fetcher.Form method="post">
             <Flex direction="column" gap="4">
               <Box>
                 <Label
@@ -176,17 +193,20 @@ export default function Page({}: Route.ComponentProps) {
                 type="submit"
                 size="3"
                 mt="2"
+                disabled={isSubmitting}
                 style={{
-                  background:
-                    "linear-gradient(135deg, var(--blue-9), var(--purple-9))",
+                  background: isSubmitting
+                    ? "var(--gray-8)"
+                    : "linear-gradient(135deg, var(--blue-9), var(--purple-9))",
                   border: "none",
-                  cursor: "pointer",
+                  cursor: isSubmitting ? "not-allowed" : "pointer",
                 }}
               >
-                🚀 Create Paste
+                <Spinner loading={isSubmitting}></Spinner>
+                Create Paste
               </Button>
             </Flex>
-          </Form>
+          </fetcher.Form>
         </Box>
       </Box>
     </Flex>

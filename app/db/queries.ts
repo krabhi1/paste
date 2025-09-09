@@ -1,6 +1,6 @@
 import { type Paste, pastes } from "./schema";
 import { db } from ".";
-import { pasteId } from "~/utils";
+import { pasteId } from "~/lib/utils";
 import { eq, desc, sql, or } from "drizzle-orm";
 export async function createPaste(args: Pick<Paste, "text" | "title">) {
   let success = false;
@@ -29,7 +29,7 @@ export async function createPaste(args: Pick<Paste, "text" | "title">) {
   throw new Error("Failed to create paste");
 }
 
-export async function getPaste(id: string) {
+export async function getPasteById(id: string) {
   const paste = await db()
     .select()
     .from(pastes)

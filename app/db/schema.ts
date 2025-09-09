@@ -7,6 +7,8 @@ export const pastes = sqliteTable("pastes", {
   text: text("text").notNull(),
 
   title: text("title").notNull(),
+  syntax: text("syntax").notNull().default("plaintext"),
+  expiry: text("expiry").notNull().default("never"),
 
   createdAt: text("created_at")
     .notNull()
