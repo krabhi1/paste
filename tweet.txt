@@ -1,0 +1,3 @@
+🚀 Working on a new privacy-friendly pastebin called "Paste"! Built with React Router v7, Turso (SQLite at the edge), and Drizzle ORM. Features include syntax highlighting, search functionality, and more. Fast, minimal, and secure! 
+
+#WebDev #ReactRouter #TypeScript #Pastebin #Privacy
