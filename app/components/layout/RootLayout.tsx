@@ -8,14 +8,14 @@ export default function RootLayout() {
       position="fixed"
       left="0"
       top="0"
-      height="100vh"
+      height="100%"
       width="100%"
       direction="column"
       p="5"
       style={{
         backgroundColor: "var(--gray-2)",
-        minHeight: 0, // ✅ allow children to shrink
       }}
+      gap={"2"}
     >
       <RootHeader />
       <Outlet />

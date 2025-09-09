@@ -10,9 +10,9 @@ export const pastes = sqliteTable("pastes", {
   syntax: text("syntax").notNull().default("plaintext"),
   expiry: text("expiry").notNull().default("never"),
 
-  createdAt: text("created_at")
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
-    .default(sql`(current_timestamp)`),
+    .default(sql`(unixepoch()*1000)`),
 });
 
 // export type

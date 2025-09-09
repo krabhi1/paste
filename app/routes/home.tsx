@@ -27,15 +27,14 @@ export default function Page({}: Route.ComponentProps) {
   return (
     <Flex
       width="100%"
-      height="100vh"
+      height="100%"
       direction="column"
       align="center"
       justify="start"
-      p="4"
+      p="3"
       style={{
         background:
           "linear-gradient(135deg, var(--gray-1) 0%, var(--gray-2) 100%)",
-        minHeight: "100vh",
       }}
     >
       <Box width="100%" style={{ maxWidth: "600px" }} mt="4">

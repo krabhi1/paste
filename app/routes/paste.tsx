@@ -38,8 +38,8 @@ export default function Page({ loaderData }: Route.ComponentProps) {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -88,15 +88,17 @@ export default function Page({ loaderData }: Route.ComponentProps) {
               </Text>
             </Box>
 
-            <Button
-              onClick={handleCopy}
-              variant={copied ? "solid" : "soft"}
-              color={copied ? "green" : "blue"}
-              size="2"
-            >
-              <CopyIcon width="16" height="16" />
-              {copied ? "Copied!" : "Copy"}
-            </Button>
+            <Flex gap="3">
+              <Button
+                onClick={handleCopy}
+                variant={copied ? "solid" : "soft"}
+                color={copied ? "green" : "blue"}
+                size="2"
+              >
+                <CopyIcon width="16" height="16" />
+                {copied ? "Copied!" : "Copy"}
+              </Button>
+            </Flex>
           </Flex>
 
           {/* Metadata */}
@@ -199,171 +201,5 @@ export default function Page({ loaderData }: Route.ComponentProps) {
         </Flex>
       </Flex>
     </Box>
-  );
-
-  return (
-    <Flex
-      width="100%"
-      direction="column"
-      p="6"
-      style={{
-        background:
-          "linear-gradient(135deg, var(--gray-1) 0%, var(--gray-2) 100%)",
-      }}
-    >
-      <Flex
-        style={{ maxWidth: "1200px", margin: "0 auto", width: "100%" }}
-        direction="column"
-        flexGrow="1"
-      >
-        {/* Header */}
-        <Box mb="6">
-          <Flex justify="between" align="start" mb="4">
-            <Box>
-              <Text
-                size="6"
-                weight="bold"
-                style={{
-                  background:
-                    "linear-gradient(135deg, var(--blue-9), var(--purple-9))",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                {paste.title || "Untitled Paste"}
-              </Text>
-              <Text
-                size="2"
-                color="gray"
-                style={{ display: "block", marginTop: "4px" }}
-              >
-                ID: {paste.id}
-              </Text>
-            </Box>
-
-            <Button
-              onClick={handleCopy}
-              variant={copied ? "solid" : "soft"}
-              color={copied ? "green" : "blue"}
-              size="2"
-            >
-              <CopyIcon width="16" height="16" />
-              {copied ? "Copied!" : "Copy"}
-            </Button>
-          </Flex>
-
-          {/* Metadata */}
-          <Flex gap="4" align="center" wrap="wrap">
-            <Flex align="center" gap="2">
-              <CalendarIcon width="14" height="14" color="var(--gray-11)" />
-              <Text size="2" color="gray">
-                Created {formatDate(paste.createdAt)}
-              </Text>
-            </Flex>
-
-            <Flex align="center" gap="2">
-              <CodeIcon width="14" height="14" color="var(--gray-11)" />
-              <Badge variant="soft" size="1">
-                {"plaintext"}
-              </Badge>
-            </Flex>
-
-            <Flex align="center" gap="2">
-              <PersonIcon width="14" height="14" color="var(--gray-11)" />
-              <Text size="2" color="gray">
-                {paste.text.length} characters
-              </Text>
-            </Flex>
-          </Flex>
-        </Box>
-
-        <Separator size="4" mb="6" />
-
-        {/* Content */}
-        <Box
-          style={{
-            overflow: "hidden",
-            background: "var(--color-surface)",
-            borderRadius: "var(--radius-4)",
-            boxShadow: "var(--shadow-3)",
-            border: "1px solid var(--gray-6)",
-            display: "flex",
-            flexDirection: "column",
-            minHeight: 0, // This is crucial for flex items to shrink
-          }}
-          flexGrow="1"
-        >
-          {/* Content Header */}
-          <Flex
-            justify="between"
-            align="center"
-            p={"3"}
-            style={{
-              borderBottom: "1px solid var(--gray-6)",
-              background: "var(--gray-2)",
-            }}
-          >
-            <Badge variant="soft" size="2">
-              {paste.syntax || "plaintext"}
-            </Badge>
-            <Flex justify="center" gap="3">
-              <Button variant="soft" size="1">
-                View Raw
-              </Button>
-              <Button variant="soft" size="1">
-                Download
-              </Button>
-              <Button variant="soft" size="1" color="red">
-                Report
-              </Button>
-            </Flex>
-          </Flex>
-
-          {/* Code Content */}
-          <Box
-            style={{
-              background: "var(--gray-1)",
-              overflow: "auto",
-              position: "relative",
-              flex: 1,
-            }}
-          >
-            <Code
-              style={{
-                display: "block",
-                fontFamily: "var(--font-mono)",
-                fontSize: "var(--font-size-2)",
-                lineHeight: "1.6",
-                whiteSpace: "pre",
-                overflowX: "auto",
-                color: "var(--gray-12)",
-                background: "transparent",
-                border: "none",
-                padding: "1rem",
-                margin: 0,
-                minHeight: "100%",
-              }}
-            >
-              {paste.text}
-            </Code>
-          </Box>
-        </Box>
-
-        {/* Footer Actions */}
-        <Flex justify="between" align="center" mt="6" gap="3">
-          <Flex gap="3">
-            <Button variant="soft" size="2">
-              Edit Paste
-            </Button>
-            <Button variant="soft" size="2">
-              Fork
-            </Button>
-          </Flex>
-          <Button variant="soft" size="2" color="red">
-            Delete Paste
-          </Button>
-        </Flex>
-      </Flex>
-    </Flex>
   );
 }
