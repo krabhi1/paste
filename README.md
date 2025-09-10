@@ -10,6 +10,7 @@ A fast, minimal, and privacy‑friendly pastebin for sharing text or code. Built
 - [ ] Expiration time for pastes.
 - [ ] Syntax highlighting for various programming languages.
 - [ ] Search functionality to find pastes by keywords
+- [ ] auto-refresh public paste view every 5s or manually
 
 ### User Experience
 

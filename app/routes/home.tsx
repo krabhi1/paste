@@ -4,7 +4,7 @@ import { Outlet, redirect, useFetcher } from "react-router";
 import { Form } from "react-router";
 import { TextField, Select, TextArea, Button } from "@radix-ui/themes"; // Assuming Radix Themes for consistency
 import { createPaste } from "~/db/queries";
-import { sleep } from "~/lib/utils";
+import { IS_DEV, sleep } from "~/lib/utils";
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
@@ -12,7 +12,7 @@ export async function action({ request }: Route.ActionArgs) {
   const text = formData.get("text") as string;
   const syntax = formData.get("syntax") as string;
   const expiry = formData.get("expiry") as string;
-  await sleep(2000);
+  if (IS_DEV) await sleep(1000);
 
   // TODO: add validation
   const paste = await createPaste({ title, text });
