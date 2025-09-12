@@ -1,31 +1,14 @@
-# paste
+## Paste
 
-A fast, minimal, and privacy‑friendly pastebin for sharing text or code. Built with React Router v7 (previously Remix) in Fullstack mode, Turso (SQLite at the edge), and Drizzle ORM.
+A fast, minimal, and privacy‑friendly pastebin service designed for seamless sharing of text or code snippets.
+This powerful fullstack serverless application leverages cutting-edge technologies including React Router, Turso, Drizzle ORM, and Cloudflare Workers.
 
-## Features
+### Tech Stack
 
-### Core Features
+- React Router v7 (Fullstack mode) - Enabling robust client and server-side routing
+- Turso - Efficient SQLite database distributed at the edge
+- Drizzle ORM - Type-safe SQL query builder for enhanced database interactions
+- Cloudflare Workers - Serverless execution environment for optimal performance
+- Radix UI - Composable and accessible component system
 
-- [x] Create and share text snippets easily.
-- [ ] Expiration time for pastes.
-- [ ] Syntax highlighting for various programming languages.
-- [ ] Search functionality to find pastes by keywords
-- [ ] auto-refresh public paste view every 5s or manually
-
-### User Experience
-
-- [ ] Dark mode for better readability in low light conditions.
-- [ ] Mobile-friendly design for easy access on smartphones and tablets.
-- [ ] Markdown support for formatting text.
-
-### Security & Management
-
-- [ ] User authentication and profile management.
-- [ ] Private pastes that can only be accessed with a password and end-to-end encryption.
-- [ ] Rate limiting to prevent abuse.
-
-### Future Enhancements
-
-- [ ] API access for programmatic paste creation and retrieval.
-- [ ] Like/dislike system for pastes.
-- [ ] Burn after-read feature for sensitive information.
+[📋 View our Progress on Trello](https://trello.com/b/xk8hyzLx)
