@@ -1,5 +1,3 @@
-import { Flex } from "@radix-ui/themes";
-
 export default function Public() {
-  return <Flex width={"200px"}>Setting</Flex>;
+  return <div className="w-48">Setting</div>;
 }

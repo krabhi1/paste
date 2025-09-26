@@ -1,10 +1,27 @@
 import type { Route } from ".react-router/types/app/routes/+types/home";
-import { Box, Flex, Text as Label, Spinner } from "@radix-ui/themes"; // Added Label import
 import { Outlet, redirect, useFetcher } from "react-router";
 import { Form } from "react-router";
-import { TextField, Select, TextArea, Button } from "@radix-ui/themes"; // Assuming Radix Themes for consistency
 import { createPaste } from "~/db/queries";
 import { sleep } from "~/lib/utils";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
@@ -24,189 +41,101 @@ export default function Page({}: Route.ComponentProps) {
   const isSubmitting = fetcher.state === "submitting";
 
   return (
-    <Flex
-      width="100%"
-      height="100%"
-      direction="column"
-      align="center"
-      justify="start"
-      p="3"
-      style={{
-        background:
-          "linear-gradient(135deg, var(--gray-1) 0%, var(--gray-2) 100%)",
-      }}
-    >
-      <Box width="100%" style={{ maxWidth: "600px" }} mt="4">
-        <Box mb="6" style={{ textAlign: "center" }}>
-          <Label
-            as="p"
-            size="8"
-            weight="bold"
-            mb="2"
-            style={{
-              background:
-                "linear-gradient(135deg, var(--blue-9), var(--purple-9))",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              textAlign: "center",
-              display: "block",
-              fontSize: "2rem",
-            }}
-          >
+    <div className="w-full h-full flex flex-col items-center justify-start p-3 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="w-full max-w-2xl mt-4">
+        <div className="mb-6 text-center">
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Create New Paste
-          </Label>
-          <Label size="3" color="gray" style={{ textAlign: "center" }}>
+          </h1>
+          <p className="text-muted-foreground">
             Share your code and text with others
-          </Label>
-        </Box>
+          </p>
+        </div>
 
-        <Box
-          p="6"
-          style={{
-            background: "var(--color-surface)",
-            borderRadius: "var(--radius-4)",
-            boxShadow: "var(--shadow-5)",
-            border: "1px solid var(--gray-6)",
-          }}
-        >
-          <fetcher.Form method="post">
-            <Flex direction="column" gap="4">
-              <Box>
-                <Label
-                  htmlFor="title"
-                  size="3"
-                  weight="medium"
-                  mb="2"
-                  style={{
-                    display: "block",
-                    color: "var(--gray-12)",
-                  }}
-                >
-                  Paste Title
-                </Label>
-                <TextField.Root
-                  size="3"
+        <Card>
+          <CardHeader>
+            <CardTitle>New Paste</CardTitle>
+            <CardDescription>
+              Enter the details for your paste below
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <fetcher.Form method="post" className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Paste Title</Label>
+                <Input
                   id="title"
                   name="title"
                   placeholder="Enter a descriptive title..."
                   required
                 />
-              </Box>
+              </div>
 
-              <Flex gap="4">
-                <Box style={{ flex: 1 }}>
-                  <Label
-                    htmlFor="expiry"
-                    size="3"
-                    weight="medium"
-                    mb="2"
-                    style={{
-                      display: "block",
-                      color: "var(--gray-12)",
-                    }}
-                  >
-                    Expiry
-                  </Label>
-                  <Select.Root name="expiry" defaultValue="never">
-                    <Select.Trigger
-                      id="expiry"
-                      placeholder="Select Expiry"
-                      style={{ width: "100%" }}
-                    />
-                    <Select.Content>
-                      <Select.Item value="never">Never</Select.Item>
-                      <Select.Item value="1hr">1 Hour</Select.Item>
-                      <Select.Item value="24hr">24 Hours</Select.Item>
-                      <Select.Item value="7days">7 Days</Select.Item>
-                      <Select.Item value="30days">30 Days</Select.Item>
-                    </Select.Content>
-                  </Select.Root>
-                </Box>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="expiry">Expiry</Label>
+                  <Select name="expiry" defaultValue="never">
+                    <SelectTrigger id="expiry">
+                      <SelectValue placeholder="Select Expiry" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="never">Never</SelectItem>
+                      <SelectItem value="1hr">1 Hour</SelectItem>
+                      <SelectItem value="24hr">24 Hours</SelectItem>
+                      <SelectItem value="7days">7 Days</SelectItem>
+                      <SelectItem value="30days">30 Days</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                <Box style={{ flex: 1 }}>
-                  <Label
-                    htmlFor="syntax"
-                    size="3"
-                    weight="medium"
-                    mb="2"
-                    style={{
-                      display: "block",
-                      color: "var(--gray-12)",
-                    }}
-                  >
-                    Syntax Highlighting
-                  </Label>
-                  <Select.Root name="syntax" defaultValue="plaintext">
-                    <Select.Trigger
-                      id="syntax"
-                      placeholder="Select Language"
-                      style={{ width: "100%" }}
-                    />
-                    <Select.Content>
-                      <Select.Item value="plaintext">Plain Text</Select.Item>
-                      <Select.Item value="cpp">C++</Select.Item>
-                      <Select.Item value="java">Java</Select.Item>
-                      <Select.Item value="javascript">JavaScript</Select.Item>
-                      <Select.Item value="typescript">TypeScript</Select.Item>
-                      <Select.Item value="python">Python</Select.Item>
-                      <Select.Item value="yaml">YAML</Select.Item>
-                      <Select.Item value="json">JSON</Select.Item>
-                      <Select.Item value="css">CSS</Select.Item>
-                      <Select.Item value="html">HTML</Select.Item>
-                    </Select.Content>
-                  </Select.Root>
-                </Box>
-              </Flex>
+                <div className="space-y-2">
+                  <Label htmlFor="syntax">Syntax Highlighting</Label>
+                  <Select name="syntax" defaultValue="plaintext">
+                    <SelectTrigger id="syntax">
+                      <SelectValue placeholder="Select Language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="plaintext">Plain Text</SelectItem>
+                      <SelectItem value="cpp">C++</SelectItem>
+                      <SelectItem value="java">Java</SelectItem>
+                      <SelectItem value="javascript">JavaScript</SelectItem>
+                      <SelectItem value="typescript">TypeScript</SelectItem>
+                      <SelectItem value="python">Python</SelectItem>
+                      <SelectItem value="yaml">YAML</SelectItem>
+                      <SelectItem value="json">JSON</SelectItem>
+                      <SelectItem value="css">CSS</SelectItem>
+                      <SelectItem value="html">HTML</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-              <Box>
-                <Label
-                  htmlFor="text"
-                  size="3"
-                  weight="medium"
-                  mb="2"
-                  style={{
-                    display: "block",
-                    color: "var(--gray-12)",
-                  }}
-                >
-                  Content
-                </Label>
-                <TextArea
-                  size="3"
+              <div className="space-y-2">
+                <Label htmlFor="text">Content</Label>
+                <Textarea
                   id="text"
                   name="text"
                   placeholder="Paste your code or text here..."
                   rows={12}
                   required
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "var(--font-size-2)",
-                    resize: "vertical",
-                    minHeight: "200px",
-                  }}
+                  className="font-mono text-sm resize-vertical min-h-[200px]"
                 />
-              </Box>
+              </div>
 
               <Button
                 type="submit"
-                size="3"
-                mt="2"
                 disabled={isSubmitting}
-                style={{
-                  background: isSubmitting
-                    ? "var(--gray-8)"
-                    : "linear-gradient(135deg, var(--blue-9), var(--purple-9))",
-                  border: "none",
-                  cursor: isSubmitting ? "not-allowed" : "pointer",
-                }}
+                className="w-full bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
-                <Spinner loading={isSubmitting}></Spinner>
+                {isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Create Paste
               </Button>
-            </Flex>
-          </fetcher.Form>
-        </Box>
-      </Box>
-    </Flex>
+            </fetcher.Form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }

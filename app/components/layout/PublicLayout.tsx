@@ -1,9 +1,11 @@
 import type { Route } from ".react-router/types/app/components/layout/+types/PublicLayout";
-import { Box, Flex, Text, Badge, Separator } from "@radix-ui/themes";
 import { Outlet, Link } from "react-router";
 import { getLatestPastes } from "~/db/queries";
 import type { Paste } from "~/db/schema";
-import { ClockIcon, CodeIcon } from "@radix-ui/react-icons";
+import { ClockIcon, CodeIcon } from "lucide-react";
+import { Badge } from "~/components/ui/badge";
+import { Separator } from "~/components/ui/separator";
+import { Card, CardContent, CardHeader } from "~/components/ui/card";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const pasteList = await getLatestPastes(10);
@@ -12,21 +14,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function PublicLayout({ loaderData }: Route.ComponentProps) {
   const { pasteList } = loaderData;
   return (
-    <Flex flexGrow="1" style={{ minHeight: 0 }} gap="4" align="stretch">
+    <div className="flex flex-grow min-h-0 gap-4">
       <Outlet />
-      <Box
-        width="280px"
-        flexShrink="0"
-        style={{
-          background: "var(--color-surface)",
-          borderRadius: "var(--radius-3)",
-          border: "1px solid var(--gray-6)",
-          overflow: "hidden",
-        }}
-      >
+      <Card className="w-72 flex-shrink-0 overflow-hidden">
         <PublicList list={pasteList} />
-      </Box>
-    </Flex>
+      </Card>
+    </div>
   );
 }
 
@@ -36,7 +29,7 @@ function PublicList({ list }: { list: Paste[] }) {
 
     const now = new Date();
     let diffInMinutes = Math.floor(
-      (now.getTime() - date.getTime()) / (1000 * 60)
+      (now.getTime() - date.getTime()) / (1000 * 60),
     );
 
     if (diffInMinutes < 0) diffInMinutes = 0;
@@ -54,112 +47,65 @@ function PublicList({ list }: { list: Paste[] }) {
   };
 
   return (
-    <Flex direction="column" style={{ height: "100%" }}>
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <Box
-        p="3"
-        style={{
-          background: "var(--gray-2)",
-          borderBottom: "1px solid var(--gray-6)",
-        }}
-      >
-        <Text size="3" weight="bold" color="gray">
+      <CardHeader className="bg-muted/50 border-b p-3">
+        <h3 className="text-sm font-bold text-muted-foreground">
           Recent Pastes
-        </Text>
-      </Box>
+        </h3>
+      </CardHeader>
 
       {/* List */}
-      <Box style={{ flex: 1, overflow: "auto" }}>
+      <CardContent className="flex-1 overflow-auto p-0">
         {list.length === 0 ? (
-          <Box p="4" style={{ textAlign: "center" }}>
-            <Text size="2" color="gray">
-              No pastes yet
-            </Text>
-          </Box>
+          <div className="p-4 text-center">
+            <p className="text-sm text-muted-foreground">No pastes yet</p>
+          </div>
         ) : (
-          <Flex direction="column">
+          <div className="flex flex-col">
             {list.map((paste, index) => (
-              <Box key={paste.id}>
-                <Link
-                  to={`/${paste.id}`}
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  <Box
-                    p="3"
-                    style={{
-                      cursor: "pointer",
-                      transition: "background-color 0.2s ease",
-                    }}
-                    className="paste-item"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "var(--gray-3)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                    }}
-                  >
-                    <Flex direction="column" gap="2">
+              <div key={paste.id}>
+                <Link to={`/${paste.id}`} className="no-underline text-inherit">
+                  <div className="p-3 cursor-pointer transition-colors hover:bg-muted/50">
+                    <div className="flex flex-col gap-2">
                       {/* Title */}
-                      <Text
-                        size="2"
-                        weight="medium"
-                        style={{
-                          color: "var(--gray-12)",
-                          lineHeight: "1.3",
-                        }}
-                      >
+                      <p className="text-sm font-medium text-foreground leading-tight">
                         {paste.title || "Untitled"}
-                      </Text>
+                      </p>
 
                       {/* Preview text */}
-                      <Text
-                        size="1"
-                        style={{
-                          color: "var(--gray-11)",
-                          lineHeight: "1.4",
-                          fontFamily: "var(--font-mono)",
-                        }}
-                      >
+                      <p className="text-xs text-muted-foreground leading-snug font-mono">
                         {truncateText(paste.text)}
-                      </Text>
+                      </p>
 
                       {/* Meta info */}
-                      <Flex justify="between" align="center" mt="1">
-                        <Flex align="center" gap="1">
-                          <ClockIcon
-                            width="12"
-                            height="12"
-                            color="var(--gray-9)"
-                          />
-                          <Text size="1" color="gray">
+                      <div className="flex justify-between items-center mt-1">
+                        <div className="flex items-center gap-1">
+                          <ClockIcon className="w-3 h-3 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">
                             {formatTimeAgo(paste.createdAt)}
-                          </Text>
-                        </Flex>
+                          </span>
+                        </div>
 
-                        <Flex align="center" gap="1">
-                          <CodeIcon
-                            width="12"
-                            height="12"
-                            color="var(--gray-9)"
-                          />
+                        <div className="flex items-center gap-1">
+                          <CodeIcon className="w-3 h-3 text-muted-foreground" />
                           <Badge
                             variant="outline"
-                            size="1"
-                            style={{ fontSize: "10px" }}
+                            className="text-[10px] h-4 px-1"
                           >
                             {paste.syntax || "txt"}
                           </Badge>
-                        </Flex>
-                      </Flex>
-                    </Flex>
-                  </Box>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </Link>
-                {index < list.length - 1 && <Separator size="4" />}
-              </Box>
+                {index < list.length - 1 && <Separator />}
+              </div>
             ))}
-          </Flex>
+          </div>
         )}
-      </Box>
-    </Flex>
+      </CardContent>
+    </div>
   );
 }

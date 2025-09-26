@@ -1,21 +1,23 @@
 import {
-  Flex,
-  Box,
-  Text,
-  Button,
-  Badge,
+  Copy,
+  Calendar,
   Code,
-  Separator,
-} from "@radix-ui/themes";
-import {
-  CopyIcon,
-  CalendarIcon,
-  CodeIcon,
-  PersonIcon,
-} from "@radix-ui/react-icons";
+  User,
+  Download,
+  FileText,
+  Flag,
+  Edit,
+  GitBranch,
+  Trash2,
+} from "lucide-react";
 import type { Route } from "./+types/paste";
 import { getPasteById } from "~/db/queries";
 import { useState } from "react";
+import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
+import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { Separator } from "~/components/ui/separator";
+
 export async function loader({ request, params }: Route.LoaderArgs) {
   const { id } = params;
   const paste = await getPasteById(id!);
@@ -24,6 +26,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   }
   return { paste };
 }
+
 export default function Page({ loaderData }: Route.ComponentProps) {
   const { paste } = loaderData;
   const [copied, setCopied] = useState(false);
@@ -49,157 +52,99 @@ export default function Page({ loaderData }: Route.ComponentProps) {
   };
 
   return (
-    <Box
-      width="100%"
-      flexGrow={"1"}
-      p="6"
-      style={{
-        background:
-          "linear-gradient(135deg, var(--gray-1) 0%, var(--gray-2) 100%)",
-      }}
-    >
-      <Flex
-        style={{ maxWidth: "600px", margin: "0 auto", width: "100%" }}
-        direction="column"
-        height="100%"
-      >
+    <div className="w-full flex-grow p-6 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="max-w-4xl mx-auto w-full h-full flex flex-col">
         {/* Header */}
-        <Box mb="6">
-          <Flex justify="between" align="start" mb="4">
-            <Box>
-              <Text
-                size="6"
-                weight="bold"
-                style={{
-                  background:
-                    "linear-gradient(135deg, var(--blue-9), var(--purple-9))",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
+        <div className="mb-6">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 {paste.title || "Untitled Paste"}
-              </Text>
-              <Text
-                size="2"
-                color="gray"
-                style={{ display: "block", marginTop: "4px" }}
-              >
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
                 ID: {paste.id}
-              </Text>
-            </Box>
+              </p>
+            </div>
 
-            <Flex gap="3">
+            <div className="flex gap-3">
               <Button
                 onClick={handleCopy}
-                variant={copied ? "solid" : "soft"}
-                color={copied ? "green" : "blue"}
-                size="2"
+                variant={copied ? "default" : "secondary"}
+                size="sm"
               >
-                <CopyIcon width="16" height="16" />
+                <Copy className="w-4 h-4 mr-2" />
                 {copied ? "Copied!" : "Copy"}
               </Button>
-            </Flex>
-          </Flex>
+            </div>
+          </div>
 
           {/* Metadata */}
-          <Flex gap="4" align="center" wrap="wrap">
-            <Flex align="center" gap="2">
-              <CalendarIcon width="14" height="14" color="var(--gray-11)" />
-              <Text size="2" color="gray">
+          <div className="flex gap-4 items-center flex-wrap">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
                 Created {formatDate(paste.createdAt)}
-              </Text>
-            </Flex>
+              </span>
+            </div>
 
-            <Flex align="center" gap="2">
-              <CodeIcon width="14" height="14" color="var(--gray-11)" />
-              <Badge variant="soft" size="1">
-                {"plaintext"}
-              </Badge>
-            </Flex>
+            <div className="flex items-center gap-2">
+              <Code className="w-3.5 h-3.5 text-muted-foreground" />
+              <Badge variant="secondary">{"plaintext"}</Badge>
+            </div>
 
-            <Flex align="center" gap="2">
-              <PersonIcon width="14" height="14" color="var(--gray-11)" />
-              <Text size="2" color="gray">
+            <div className="flex items-center gap-2">
+              <User className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
                 {paste.text.length} characters
-              </Text>
-            </Flex>
-          </Flex>
-        </Box>
+              </span>
+            </div>
+          </div>
+        </div>
 
-        <Separator size="4" mb="6" />
+        <Separator className="mb-6" />
         {/* Code Content */}
-        <Flex
-          direction={"column"}
-          flexGrow="1"
-          style={{
-            minHeight: 0,
-            background: "var(--color-surface)",
-            borderRadius: "var(--radius-4)",
-            boxShadow: "var(--shadow-3)",
-          }}
-        >
-          <Flex
-            justify="between"
-            align="center"
-            p={"3"}
-            style={{
-              borderBottom: "1px solid var(--gray-4)",
-            }}
-          >
-            <Badge variant="soft" size="2">
-              {paste.syntax || "plaintext"}
-            </Badge>
-            <Flex justify="center" gap="3">
-              <Button variant="soft" size="1">
+        <Card className="flex-grow flex flex-col min-h-0">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b">
+            <Badge variant="secondary">{paste.syntax || "plaintext"}</Badge>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <FileText className="w-4 h-4 mr-2" />
                 View Raw
               </Button>
-              <Button variant="soft" size="1">
+              <Button variant="outline" size="sm">
+                <Download className="w-4 h-4 mr-2" />
                 Download
               </Button>
-              <Button variant="soft" size="1" color="red">
+              <Button variant="destructive" size="sm">
+                <Flag className="w-4 h-4 mr-2" />
                 Report
               </Button>
-            </Flex>
-          </Flex>
-          <Box
-            style={{ background: "var(--gray-1)" }}
-            overflow={"auto"}
-            flexGrow="1"
-          >
-            <Code
-              style={{
-                display: "block",
-                fontFamily: "var(--font-mono)",
-                fontSize: "var(--font-size-2)",
-                lineHeight: "1.6",
-                whiteSpace: "pre",
-                color: "var(--gray-12)",
-                background: "transparent",
-                border: "none",
-                padding: "1rem",
-                margin: 0,
-                overflow: "auto",
-              }}
-            >
+            </div>
+          </CardHeader>
+          <CardContent className="flex-grow p-0 overflow-auto bg-muted/30">
+            <pre className="p-4 font-mono text-sm leading-relaxed whitespace-pre text-foreground bg-transparent border-none m-0 overflow-auto">
               {paste.text}
-            </Code>
-          </Box>
-        </Flex>
+            </pre>
+          </CardContent>
+        </Card>
         {/* Footer Actions */}
-        <Flex justify="between" align="center" mt="6" gap="3">
-          <Flex gap="3">
-            <Button variant="soft" size="2">
+        <div className="flex justify-between items-center mt-6 gap-3">
+          <div className="flex gap-3">
+            <Button variant="secondary" size="sm">
+              <Edit className="w-4 h-4 mr-2" />
               Edit Paste
             </Button>
-            <Button variant="soft" size="2">
+            <Button variant="secondary" size="sm">
+              <GitBranch className="w-4 h-4 mr-2" />
               Fork
             </Button>
-          </Flex>
-          <Button variant="soft" size="2" color="red">
+          </div>
+          <Button variant="destructive" size="sm">
+            <Trash2 className="w-4 h-4 mr-2" />
             Delete Paste
           </Button>
-        </Flex>
-      </Flex>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }

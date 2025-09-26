@@ -1,90 +1,54 @@
-import {
-  MagnifyingGlassIcon,
-  PlusIcon,
-  ReaderIcon,
-} from "@radix-ui/react-icons";
-import { Flex, Text, TextField, Button, Box } from "@radix-ui/themes";
+import { SearchIcon, PlusIcon, BookIcon } from "lucide-react";
 import { Link } from "react-router";
+import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
 
 export default function RootHeader() {
   return (
-    <Box
-      style={{
-        background: "var(--color-surface)",
-        borderBottom: "1px solid var(--gray-6)",
-        boxShadow: "var(--shadow-2)",
-      }}
-    >
-      <Flex
-        px="6"
-        py="3"
-        justify="between"
-        align="center"
-        style={{ maxWidth: "1200px", margin: "0 auto" }}
-      >
+    <div className="bg-card border-b shadow-sm">
+      <div className="flex items-center justify-between px-6 py-3 mx-auto max-w-screen-xl">
         {/* Logo/Brand */}
-        <Link to="/" style={{ textDecoration: "none" }}>
-          <Flex align="center" gap="2">
-            <Box
-              style={{
-                background:
-                  "linear-gradient(135deg, var(--blue-9), var(--purple-9))",
-                borderRadius: "var(--radius-2)",
-                padding: "6px 8px",
-              }}
-            >
-              <ReaderIcon color="white" width="18" height="18" />
-            </Box>
-            <Text
-              size="5"
-              weight="bold"
-              style={{
-                background:
-                  "linear-gradient(135deg, var(--blue-9), var(--purple-9))",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
+        <Link to="/" className="no-underline">
+          <div className="flex items-center gap-2">
+            <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-md p-1.5">
+              <BookIcon className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Paste
-            </Text>
-          </Flex>
+            </span>
+          </div>
         </Link>
 
         {/* Search Bar */}
-        <Box style={{ flex: 1, maxWidth: "400px", margin: "0 2rem" }}>
-          <TextField.Root
-            placeholder="Search pastes..."
-            size="2"
-            style={{ width: "100%" }}
-          >
-            <TextField.Slot>
-              <MagnifyingGlassIcon height="16" width="16" />
-            </TextField.Slot>
-          </TextField.Root>
-        </Box>
+        <div className="flex-1 max-w-sm mx-8">
+          <div className="relative">
+            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search pastes..." className="pl-10 w-full" />
+          </div>
+        </div>
 
         {/* Actions */}
-        <Flex align="center" gap="3">
-          <Link to="/" style={{ textDecoration: "none" }}>
-            <Button variant="soft" size="2">
-              <PlusIcon width="16" height="16" />
+        <div className="flex items-center gap-3">
+          <Link to="/" className="no-underline">
+            <Button variant="secondary" size="sm">
+              <PlusIcon className="w-4 h-4 mr-2" />
               New Paste
             </Button>
           </Link>
 
-          {/* <Link to="/search" style={{ textDecoration: "none" }}>
-            <Button variant="ghost" size="2">
+          {/* <Link to="/search" className="no-underline">
+            <Button variant="ghost" size="sm">
               Browse
             </Button>
           </Link>
 
-          <Link to="/about" style={{ textDecoration: "none" }}>
-            <Button variant="ghost" size="2">
+          <Link to="/about" className="no-underline">
+            <Button variant="ghost" size="sm">
               About
             </Button>
           </Link> */}
-        </Flex>
-      </Flex>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
