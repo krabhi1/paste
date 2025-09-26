@@ -13,7 +13,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx app/db/seed.ts",
-    "test": "vitest"
+    "test": "vitest",
+    "predev": "rm -rf .react-router .wrangler",
+    "clean": "rm -rf .react-router .wrangler node_modules build"
   },
   "dependencies": {
     "@libsql/client": "^0.15.14",
