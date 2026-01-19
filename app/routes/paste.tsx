@@ -58,7 +58,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
         <div className="mb-6">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold ">
                 {paste.title || "Untitled Paste"}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
@@ -79,18 +79,19 @@ export default function Page({ loaderData }: Route.ComponentProps) {
           </div>
 
           {/* Metadata */}
-          <div className="flex gap-4 items-center flex-wrap">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center gap-2">
               <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
-                Created {formatDate(paste.createdAt)}
+                <span className="font-semibold">Created:</span>{" "}
+                {formatDate(paste.createdAt)}
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
+            {/*<div className="flex items-center gap-2">
               <Code className="w-3.5 h-3.5 text-muted-foreground" />
               <Badge variant="secondary">{"plaintext"}</Badge>
-            </div>
+            </div>*/}
 
             <div className="flex items-center gap-2">
               <User className="w-3.5 h-3.5 text-muted-foreground" />
@@ -127,7 +128,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
             </pre>
           </CardContent>
         </Card>
-        {/* Footer Actions */}
+        {/* TODO: Implement footer actions
         <div className="flex justify-between items-center mt-6 gap-3">
           <div className="flex gap-3">
             <Button variant="secondary" size="sm">
@@ -144,6 +145,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
             Delete Paste
           </Button>
         </div>
+        */}
       </div>
     </div>
   );

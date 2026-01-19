@@ -2,7 +2,7 @@ import type { Route } from ".react-router/types/app/components/layout/+types/Pub
 import { Outlet, Link } from "react-router";
 import { getLatestPastes } from "~/db/queries";
 import type { Paste } from "~/db/schema";
-import { ClockIcon, CodeIcon } from "lucide-react";
+import { ClockIcon, CodeIcon, FileTextIcon } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Separator } from "~/components/ui/separator";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
@@ -16,9 +16,9 @@ export default function PublicLayout({ loaderData }: Route.ComponentProps) {
   return (
     <div className="flex flex-grow min-h-0 gap-4">
       <Outlet />
-      <Card className="w-72 flex-shrink-0 overflow-hidden">
+      <div className="w-72 flex-shrink-0 overflow-hidden">
         <PublicList list={pasteList} />
-      </Card>
+      </div>
     </div>
   );
 }
@@ -47,12 +47,15 @@ function PublicList({ list }: { list: Paste[] }) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <Card className="flex flex-col h-full">
       {/* Header */}
-      <CardHeader className="bg-muted/50 border-b p-3">
-        <h3 className="text-sm font-bold text-muted-foreground">
-          Recent Pastes
-        </h3>
+      <CardHeader className="px-2 ">
+        <div className="flex items-center gap-2">
+          <FileTextIcon className="w-4 h-4 text-muted-foreground" />
+          <h3 className="text-sm font-bold text-muted-foreground">
+            Recent Pastes
+          </h3>
+        </div>
       </CardHeader>
 
       {/* List */}
@@ -67,19 +70,14 @@ function PublicList({ list }: { list: Paste[] }) {
               <div key={paste.id}>
                 <Link to={`/${paste.id}`} className="no-underline text-inherit">
                   <div className="p-3 cursor-pointer transition-colors hover:bg-muted/50">
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
                       {/* Title */}
                       <p className="text-sm font-medium text-foreground leading-tight">
                         {paste.title || "Untitled"}
                       </p>
 
-                      {/* Preview text */}
-                      <p className="text-xs text-muted-foreground leading-snug font-mono">
-                        {truncateText(paste.text)}
-                      </p>
-
                       {/* Meta info */}
-                      <div className="flex justify-between items-center mt-1">
+                      <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1">
                           <ClockIcon className="w-3 h-3 text-muted-foreground" />
                           <span className="text-xs text-muted-foreground">
@@ -87,7 +85,7 @@ function PublicList({ list }: { list: Paste[] }) {
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1">
+                        {/*<div className="flex items-center gap-1">
                           <CodeIcon className="w-3 h-3 text-muted-foreground" />
                           <Badge
                             variant="outline"
@@ -95,7 +93,7 @@ function PublicList({ list }: { list: Paste[] }) {
                           >
                             {paste.syntax || "txt"}
                           </Badge>
-                        </div>
+                        </div>*/}
                       </div>
                     </div>
                   </div>
@@ -106,6 +104,6 @@ function PublicList({ list }: { list: Paste[] }) {
           </div>
         )}
       </CardContent>
-    </div>
+    </Card>
   );
 }

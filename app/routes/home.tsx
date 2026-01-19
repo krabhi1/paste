@@ -41,10 +41,10 @@ export default function Page({}: Route.ComponentProps) {
   const isSubmitting = fetcher.state === "submitting";
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-start p-3 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="w-full h-full flex flex-col items-center justify-start p-3">
       <div className="w-full max-w-2xl mt-4">
         <div className="mb-6 text-center">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-2 b bg-clip-text ">
             Create New Paste
           </h1>
           <p className="text-muted-foreground">
@@ -122,11 +122,7 @@ export default function Page({}: Route.ComponentProps) {
                 />
               </div>
 
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              >
+              <Button type="submit" disabled={isSubmitting} className="w-full ">
                 {isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
