@@ -1,3 +1,4 @@
+import type { Route } from ".react-router/types/app/routes/+types/paste";
 import {
   Copy,
   Calendar,
@@ -9,16 +10,17 @@ import {
   Edit,
   GitBranch,
   Trash2,
+  Check,
 } from "lucide-react";
-import type { Route } from "./+types/paste";
 import { getPasteById } from "~/db/queries";
 import { useState } from "react";
+import { useFetcher, Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 
-export async function loader({ request, params }: Route.LoaderArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   const { id } = params;
   const paste = await getPasteById(id!);
   if (!paste) {
@@ -27,9 +29,25 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   return { paste };
 }
 
+export async function action({ request }: Route.ActionArgs) {
+  const formData = await request.formData();
+  const intent = formData.get("intent");
+
+  if (intent === "report") {
+    // In a real app, you'd save the report to a database
+    console.log("Report received for paste");
+    return { success: true, message: "Paste reported successfully." };
+  }
+
+  return { success: false };
+}
+
 export default function Page({ loaderData }: Route.ComponentProps) {
   const { paste } = loaderData;
   const [copied, setCopied] = useState(false);
+  const fetcher = useFetcher();
+
+  const isReported = fetcher.data?.success;
 
   const handleCopy = async () => {
     try {
@@ -39,6 +57,20 @@ export default function Page({ loaderData }: Route.ComponentProps) {
     } catch (err) {
       console.error("Failed to copy text: ", err);
     }
+  };
+
+  const handleDownload = () => {
+    const blob = new Blob([paste.text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const extension =
+      paste.syntax === "plaintext" ? "txt" : paste.syntax || "txt";
+    a.href = url;
+    a.download = `${paste.title || "paste"}-${paste.id}.${extension}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const formatDate = (date: Date) => {
@@ -72,7 +104,11 @@ export default function Page({ loaderData }: Route.ComponentProps) {
                 variant={copied ? "default" : "secondary"}
                 size="sm"
               >
-                <Copy className="w-4 h-4 mr-2" />
+                {copied ? (
+                  <Check className="w-4 h-4 mr-2" />
+                ) : (
+                  <Copy className="w-4 h-4 mr-2" />
+                )}
                 {copied ? "Copied!" : "Copy"}
               </Button>
             </div>
@@ -87,11 +123,6 @@ export default function Page({ loaderData }: Route.ComponentProps) {
                 {formatDate(paste.createdAt)}
               </span>
             </div>
-
-            {/*<div className="flex items-center gap-2">
-              <Code className="w-3.5 h-3.5 text-muted-foreground" />
-              <Badge variant="secondary">{"plaintext"}</Badge>
-            </div>*/}
 
             <div className="flex items-center gap-2">
               <User className="w-3.5 h-3.5 text-muted-foreground" />
@@ -108,18 +139,27 @@ export default function Page({ loaderData }: Route.ComponentProps) {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b">
             <Badge variant="secondary">{paste.syntax || "plaintext"}</Badge>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <FileText className="w-4 h-4 mr-2" />
-                View Raw
+              <Button variant="outline" size="sm" asChild>
+                <a href={`/raw/${paste.id}`} target="_blank" rel="noreferrer">
+                  <FileText className="w-4 h-4 mr-2" />
+                  View Raw
+                </a>
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={handleDownload}>
                 <Download className="w-4 h-4 mr-2" />
                 Download
               </Button>
-              <Button variant="destructive" size="sm">
-                <Flag className="w-4 h-4 mr-2" />
-                Report
-              </Button>
+              <fetcher.Form method="post">
+                <input type="hidden" name="intent" value="report" />
+                <Button
+                  variant={isReported ? "secondary" : "destructive"}
+                  size="sm"
+                  disabled={isReported || fetcher.state !== "idle"}
+                >
+                  <Flag className="w-4 h-4 mr-2" />
+                  {isReported ? "Reported" : "Report"}
+                </Button>
+              </fetcher.Form>
             </div>
           </CardHeader>
           <CardContent className="flex-grow p-0 overflow-auto">
@@ -128,24 +168,6 @@ export default function Page({ loaderData }: Route.ComponentProps) {
             </pre>
           </CardContent>
         </Card>
-        {/* TODO: Implement footer actions
-        <div className="flex justify-between items-center mt-6 gap-3">
-          <div className="flex gap-3">
-            <Button variant="secondary" size="sm">
-              <Edit className="w-4 h-4 mr-2" />
-              Edit Paste
-            </Button>
-            <Button variant="secondary" size="sm">
-              <GitBranch className="w-4 h-4 mr-2" />
-              Fork
-            </Button>
-          </div>
-          <Button variant="destructive" size="sm">
-            <Trash2 className="w-4 h-4 mr-2" />
-            Delete Paste
-          </Button>
-        </div>
-        */}
       </div>
     </div>
   );
