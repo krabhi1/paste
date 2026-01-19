@@ -29,7 +29,7 @@ export async function action({ request }: Route.ActionArgs) {
   const expiry = formData.get("expiry") as string;
 
   // TODO: add validation
-  const paste = await createPaste({ title, text });
+  const paste = await createPaste({ title, text, syntax, expiry });
   console.log("Created paste:", paste);
   return redirect(`/${paste.id}`);
 }

@@ -4,6 +4,7 @@ import {
   Calendar,
   Code,
   User,
+  Clock,
   Download,
   FileText,
   Flag,
@@ -130,6 +131,16 @@ export default function Page({ loaderData }: Route.ComponentProps) {
                 {paste.text.length} characters
               </span>
             </div>
+
+            {paste.expiresAt && (
+              <div className="flex items-center gap-2">
+                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  <span className="font-semibold">Expires:</span>{" "}
+                  {formatDate(paste.expiresAt)}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

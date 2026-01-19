@@ -1,21 +1,57 @@
 import { type Paste, pastes } from "./schema";
 import { db } from ".";
 import { pasteId } from "~/lib/utils";
-import { eq, desc, sql, or } from "drizzle-orm";
-export async function createPaste(args: Pick<Paste, "text" | "title">) {
+import { eq, desc, sql, or, isNull, gt, and } from "drizzle-orm";
+
+/**
+ * Calculates the expiration date based on the user's selection.
+ */
+function getExpiryDate(expiry: string): Date | null {
+  const now = new Date();
+  switch (expiry) {
+    case "1hr":
+      return new Date(now.getTime() + 60 * 60 * 1000);
+    case "24hr":
+      return new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    case "7days":
+      return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    case "30days":
+      return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    case "never":
+    default:
+      return null;
+  }
+}
+
+/**
+ * Helper to filter out expired pastes in queries.
+ */
+const notExpired = () =>
+  or(isNull(pastes.expiresAt), gt(pastes.expiresAt, new Date()));
+
+export async function createPaste(args: {
+  text: string;
+  title: string;
+  syntax?: string;
+  expiry?: string;
+}) {
   let success = false;
+  const expiresAt = args.expiry ? getExpiryDate(args.expiry) : null;
+
   while (!success) {
     const id = pasteId();
     try {
       const paste = await db()
         .insert(pastes)
         .values({
-          ...args,
           id,
+          text: args.text,
+          title: args.title,
+          syntax: args.syntax || "plaintext",
+          expiresAt: expiresAt,
         })
         .returning();
       return paste[0];
-      success = true;
     } catch (e) {
       if (
         e instanceof Error &&
@@ -30,32 +66,33 @@ export async function createPaste(args: Pick<Paste, "text" | "title">) {
 }
 
 export async function getPasteById(id: string) {
-  const paste = await db()
+  const pasteList = await db()
     .select()
     .from(pastes)
-    .where(eq(pastes.id, id))
+    .where(and(eq(pastes.id, id), notExpired()))
     .limit(1);
-  if (paste.length === 0) return null;
-  return paste[0];
+
+  if (pasteList.length === 0) return null;
+  return pasteList[0];
 }
 
 export async function getLatestPastes(limit: number) {
-  const pastesList = await db()
+  return db()
     .select()
     .from(pastes)
+    .where(notExpired())
     .orderBy(desc(pastes.createdAt))
     .limit(limit);
-  return pastesList;
 }
 
 export async function getLatestPastesByPage(page: number, limit: number) {
-  const pastesList = await db()
+  return db()
     .select()
     .from(pastes)
+    .where(notExpired())
     .orderBy(desc(pastes.createdAt))
     .limit(limit)
     .offset((page - 1) * limit);
-  return pastesList;
 }
 
 export async function searchPastes(query: string, page: number, limit: number) {
@@ -67,9 +104,12 @@ export async function searchPastes(query: string, page: number, limit: number) {
     .select()
     .from(pastes)
     .where(
-      or(
-        sql`LOWER(${pastes.title}) LIKE LOWER(${pattern})`,
-        sql`LOWER(${pastes.text}) LIKE LOWER(${pattern})`,
+      and(
+        notExpired(),
+        or(
+          sql`LOWER(${pastes.title}) LIKE LOWER(${pattern})`,
+          sql`LOWER(${pastes.text}) LIKE LOWER(${pattern})`,
+        ),
       ),
     )
     .limit(limit)
