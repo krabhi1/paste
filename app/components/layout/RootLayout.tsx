@@ -3,9 +3,11 @@ import RootHeader from "~/components/layout/RootHeader";
 
 export default function RootLayout() {
   return (
-    <div className="fixed left-0 top-0 h-full w-full flex flex-col p-5 bg-background gap-2">
+    <div className="fixed inset-0 flex flex-col p-2 sm:p-3 md:p-5 bg-background gap-2 overflow-hidden">
       <RootHeader />
-      <Outlet />
+      <main className="flex-1 min-h-0 overflow-auto">
+        <Outlet />
+      </main>
     </div>
   );
 }

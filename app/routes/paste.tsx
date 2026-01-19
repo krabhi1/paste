@@ -84,13 +84,13 @@ export default function Page({ loaderData }: Route.ComponentProps) {
   };
 
   return (
-    <div className="w-full flex-grow p-6 bg-background">
+    <div className="w-full flex-grow p-3 sm:p-6 bg-background">
       <div className="max-w-4xl mx-auto w-full h-full flex flex-col">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex justify-between items-start mb-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
             <div>
-              <h1 className="text-3xl font-bold ">
+              <h1 className="text-2xl sm:text-3xl font-bold break-all">
                 {paste.title || "Untitled Paste"}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
@@ -136,9 +136,9 @@ export default function Page({ loaderData }: Route.ComponentProps) {
         <Separator className="mb-6" />
         {/* Code Content */}
         <Card className="flex-grow flex flex-col min-h-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b">
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between space-y-0 pb-3 border-b gap-4">
             <Badge variant="secondary">{paste.syntax || "plaintext"}</Badge>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button variant="outline" size="sm" asChild>
                 <a href={`/raw/${paste.id}`} target="_blank" rel="noreferrer">
                   <FileText className="w-4 h-4 mr-2" />

@@ -44,20 +44,22 @@ export default function Page({}: Route.ComponentProps) {
     <div className="w-full h-full flex flex-col items-center justify-start p-3">
       <div className="w-full max-w-2xl mt-4">
         <div className="mb-6 text-center">
-          <h1 className="text-4xl font-bold mb-2">Create New Paste</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-4xl font-bold mb-2">
+            Create New Paste
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Share your code and text with others
           </p>
         </div>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="px-4 sm:px-6">
             <CardTitle>New Paste</CardTitle>
             <CardDescription>
               Enter the details for your paste below
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 sm:px-6">
             <fetcher.Form method="post" className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Paste Title</Label>

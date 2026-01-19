@@ -14,11 +14,13 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function PublicLayout({ loaderData }: Route.ComponentProps) {
   const { pasteList } = loaderData;
   return (
-    <div className="flex flex-grow min-h-0 gap-4">
-      <Outlet />
-      <div className="w-72 flex-shrink-0 overflow-hidden">
-        <PublicList list={pasteList} />
+    <div className="flex flex-col lg:flex-row flex-grow min-h-0 gap-4">
+      <div className="flex-1 lg:min-h-0">
+        <Outlet />
       </div>
+      <aside className="w-full lg:w-72 flex-shrink-0 h-[400px] lg:h-full pb-4 lg:pb-0">
+        <PublicList list={pasteList} />
+      </aside>
     </div>
   );
 }
