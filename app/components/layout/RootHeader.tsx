@@ -5,12 +5,12 @@ import { Button } from "~/components/ui/button";
 
 export default function RootHeader() {
   return (
-    <div className="border-b ">
+    <div className="border-b bg-card">
       <div className="flex items-center justify-between px-6 py-3 mx-auto max-w-screen-xl">
         {/* Logo/Brand */}
-        <Link to="/" className="no-underline ">
+        <Link to="/" className="no-underline">
           <div className="flex items-center gap-2">
-            <div className=" rounded-md p-1.5">
+            <div className="rounded-md p-1.5">
               <BookIcon className="w-5 h-5 " />
             </div>
             <span className="text-xl font-bold bg-clip-text">Paste</span>

@@ -52,7 +52,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
   };
 
   return (
-    <div className="w-full flex-grow p-6 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="w-full flex-grow p-6 bg-background">
       <div className="max-w-4xl mx-auto w-full h-full flex flex-col">
         {/* Header */}
         <div className="mb-6">
@@ -122,7 +122,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="flex-grow p-0 overflow-auto bg-muted/30">
+          <CardContent className="flex-grow p-0 overflow-auto">
             <pre className="p-4 font-mono text-sm leading-relaxed whitespace-pre text-foreground bg-transparent border-none m-0 overflow-auto">
               {paste.text}
             </pre>

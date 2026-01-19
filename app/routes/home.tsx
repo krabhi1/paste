@@ -44,9 +44,7 @@ export default function Page({}: Route.ComponentProps) {
     <div className="w-full h-full flex flex-col items-center justify-start p-3">
       <div className="w-full max-w-2xl mt-4">
         <div className="mb-6 text-center">
-          <h1 className="text-4xl font-bold mb-2 b bg-clip-text ">
-            Create New Paste
-          </h1>
+          <h1 className="text-4xl font-bold mb-2">Create New Paste</h1>
           <p className="text-muted-foreground">
             Share your code and text with others
           </p>
@@ -71,7 +69,7 @@ export default function Page({}: Route.ComponentProps) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="expiry">Expiry</Label>
                   <Select name="expiry" defaultValue="never">
@@ -122,7 +120,7 @@ export default function Page({}: Route.ComponentProps) {
                 />
               </div>
 
-              <Button type="submit" disabled={isSubmitting} className="w-full ">
+              <Button type="submit" disabled={isSubmitting} className="w-full">
                 {isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
