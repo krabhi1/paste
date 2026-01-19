@@ -5,7 +5,7 @@ import { Button } from "~/components/ui/button";
 
 export default function RootHeader() {
   return (
-    <div className="border-b bg-card">
+    <div className=" ">
       <div className="flex items-center justify-between px-4 md:px-6 py-2 md:py-3 mx-auto max-w-screen-xl gap-2">
         {/* Logo/Brand */}
         <Link to="/" className="no-underline">

@@ -2,10 +2,8 @@ import type { Route } from ".react-router/types/app/components/layout/+types/Pub
 import { Outlet, Link } from "react-router";
 import { getLatestPastes } from "~/db/queries";
 import type { Paste } from "~/db/schema";
-import { ClockIcon, CodeIcon, FileTextIcon } from "lucide-react";
-import { Badge } from "~/components/ui/badge";
+import { ClockIcon, FileTextIcon } from "lucide-react";
 import { Separator } from "~/components/ui/separator";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const pasteList = await getLatestPastes(10);
@@ -14,17 +12,16 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function PublicLayout({ loaderData }: Route.ComponentProps) {
   const { pasteList } = loaderData;
   return (
-    <div className="flex flex-col lg:flex-row flex-grow min-h-0 gap-4">
-      <div className="flex-1 lg:min-h-0">
+    <div className="flex flex-col lg:flex-row flex-1 min-h-0 gap-6">
+      <div className="flex-1 min-h-0 overflow-auto">
         <Outlet />
       </div>
-      <aside className="w-full lg:w-72 flex-shrink-0 h-[400px] lg:h-full pb-4 lg:pb-0">
+      <aside className="w-full lg:w-72 flex-shrink-0 h-[300px] lg:h-full pb-8 lg:pb-0">
         <PublicList list={pasteList} />
       </aside>
     </div>
   );
 }
-
 function PublicList({ list }: { list: Paste[] }) {
   const formatTimeAgo = (date: Date) => {
     if (isNaN(date.getTime())) return "Invalid date";
@@ -49,19 +46,19 @@ function PublicList({ list }: { list: Paste[] }) {
   };
 
   return (
-    <Card className="flex flex-col h-full">
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <CardHeader className="px-2 ">
+      <div className="px-4 pt-4 pb-2">
         <div className="flex items-center gap-2">
-          <FileTextIcon className="w-4 h-4 text-muted-foreground" />
-          <h3 className="text-sm font-bold text-muted-foreground">
+          <FileTextIcon className="w-4 h-4 text-muted-foreground/70" />
+          <h3 className="text-xs font-bold text-muted-foreground/70 tracking-tight uppercase">
             Recent Pastes
           </h3>
         </div>
-      </CardHeader>
+      </div>
 
       {/* List */}
-      <CardContent className="flex-1 overflow-auto p-0">
+      <div className="flex-1 min-h-0 overflow-auto p-0">
         {list.length === 0 ? (
           <div className="p-4 text-center">
             <p className="text-sm text-muted-foreground">No pastes yet</p>
@@ -71,7 +68,7 @@ function PublicList({ list }: { list: Paste[] }) {
             {list.map((paste, index) => (
               <div key={paste.id}>
                 <Link to={`/${paste.id}`} className="no-underline text-inherit">
-                  <div className="p-3 cursor-pointer transition-colors hover:bg-muted/50">
+                  <div className="p-4 cursor-pointer transition-colors hover:bg-muted/50">
                     <div className="flex flex-col gap-1">
                       {/* Title */}
                       <p className="text-sm font-medium text-foreground leading-tight">
@@ -105,7 +102,7 @@ function PublicList({ list }: { list: Paste[] }) {
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
