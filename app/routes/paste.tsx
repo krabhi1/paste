@@ -226,8 +226,8 @@ export default function Page({ loaderData }: Route.ComponentProps) {
             </div>
           </CardHeader>
 
-          <CardContent className="lg:flex-grow p-0 lg:overflow-auto bg-card/30">
-            <pre className="p-4 sm:p-6 font-mono text-sm leading-relaxed whitespace-pre text-foreground bg-transparent border-none m-0 overflow-x-auto lg:overflow-auto selection:bg-primary/20">
+          <CardContent className="lg:flex-grow p-0 bg-card/30 max-h-[70vh] overflow-y-auto">
+            <pre className="p-4 sm:p-6 font-mono text-sm leading-relaxed whitespace-pre text-foreground bg-transparent border-none m-0 overflow-x-auto selection:bg-primary/20">
               {paste.text}
             </pre>
           </CardContent>

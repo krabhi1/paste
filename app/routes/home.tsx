@@ -106,7 +106,7 @@ export default function Page({}: Route.ComponentProps) {
                 placeholder="Paste your code or text here..."
                 rows={12}
                 required
-                className="font-mono text-sm resize-vertical min-h-[200px]"
+                className="font-mono text-sm resize-vertical min-h-[200px] max-h-[500px] overflow-y-auto"
               />
             </div>
 
