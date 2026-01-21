@@ -1,9 +1,12 @@
 import { SearchIcon, PlusIcon, BookIcon } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 
 export default function RootHeader() {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   return (
     <header className="border-b bg-card">
       <div className="flex items-center justify-between px-4 md:px-6 py-2 md:py-3 mx-auto max-w-screen-xl">
@@ -31,16 +34,18 @@ export default function RootHeader() {
 
         {/* Right Section: Equal buffer to ensure center centering */}
         <div className="flex-1 flex justify-end items-center gap-3">
-          <Link to="/" className="no-underline">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-9 w-9 sm:h-9 sm:w-auto sm:px-4 p-0"
-            >
-              <PlusIcon className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">New</span>
-            </Button>
-          </Link>
+          {!isHome && (
+            <Link to="/" className="no-underline">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="h-9 w-9 sm:h-9 sm:w-auto sm:px-4 p-0"
+              >
+                <PlusIcon className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">New</span>
+              </Button>
+            </Link>
+          )}
 
           {/* Hidden Browse/About links for clean look, easy to restore */}
           {/* <Link to="/search" className="no-underline">
