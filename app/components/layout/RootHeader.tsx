@@ -24,9 +24,9 @@ export default function RootHeader() {
           <nav className="flex items-center gap-1 sm:gap-2">
             <Link
               to="/search"
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-foreground ${
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors ${
                 location.pathname === "/search"
-                  ? "text-primary bg-primary/5 font-semibold"
+                  ? "text-primary font-semibold"
                   : "text-muted-foreground"
               }`}
             >
@@ -34,7 +34,7 @@ export default function RootHeader() {
                 className={`w-4 h-4 ${location.pathname === "/search" ? "text-primary" : "text-muted-foreground"}`}
               />
               <span
-                className={`hidden sm:inline ${location.pathname === "/search" ? "text-primary font-semibold" : ""}`}
+                className={` sm:inline ${location.pathname === "/search" ? "text-primary font-semibold" : ""}`}
               >
                 Search
               </span>
@@ -42,14 +42,14 @@ export default function RootHeader() {
 
             <Link
               to="/about"
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-foreground ${
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors ${
                 location.pathname === "/about"
-                  ? "text-primary bg-primary/5 font-semibold"
+                  ? "text-primary  font-semibold"
                   : "text-muted-foreground"
               }`}
             >
               <span
-                className={`hidden sm:inline ${location.pathname === "/about" ? "text-primary font-semibold" : ""}`}
+                className={`sm:inline ${location.pathname === "/about" ? "text-primary font-semibold" : ""}`}
               >
                 About
               </span>

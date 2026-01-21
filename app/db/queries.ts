@@ -165,21 +165,60 @@ export async function searchPastes(
 }
 
 /**
- * Quick title-only search for header suggestions.
+ * Quick search for suggestions, matching title and content.
  */
 export async function getSearchSuggestions(query: string, limit: number = 5) {
-  if (!query.trim()) return [];
-  const pattern = `%${query.trim()}%`;
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) return [];
+  const pattern = `%${trimmedQuery}%`;
 
-  return db()
+  const results = await db()
     .select({
       id: pastes.id,
       title: pastes.title,
       syntax: pastes.syntax,
+      text: pastes.text,
     })
     .from(pastes)
     .where(
-      and(notExpired(), sql`LOWER(${pastes.title}) LIKE LOWER(${pattern})`),
+      and(
+        notExpired(),
+        or(
+          sql`LOWER(${pastes.title}) LIKE LOWER(${pattern})`,
+          sql`LOWER(${pastes.text}) LIKE LOWER(${pattern})`,
+        ),
+      ),
     )
     .limit(limit);
+
+  return results.map((item) => {
+    const isTitleMatch = item.title
+      .toLowerCase()
+      .includes(trimmedQuery.toLowerCase());
+    let snippet = null;
+
+    if (!isTitleMatch) {
+      const cleanText = item.text.replace(/\s+/g, " ");
+      const index = cleanText.toLowerCase().indexOf(trimmedQuery.toLowerCase());
+      if (index !== -1) {
+        const start = Math.max(0, index - 30);
+        const end = Math.min(
+          cleanText.length,
+          index + trimmedQuery.length + 30,
+        );
+        snippet =
+          (start > 0 ? "..." : "") +
+          cleanText.substring(start, end) +
+          (end < cleanText.length ? "..." : "");
+      }
+    }
+
+    return {
+      id: item.id,
+      title: item.title,
+      syntax: item.syntax,
+      matchType: isTitleMatch ? ("title" as const) : ("content" as const),
+      snippet,
+    };
+  });
 }

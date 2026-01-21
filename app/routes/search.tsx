@@ -143,6 +143,25 @@ export default function SearchPage() {
     });
   };
 
+  const getSnippet = (text: string, q: string) => {
+    if (!q.trim()) return null;
+    const cleanText = text.replace(/\s+/g, " ");
+    const index = cleanText.toLowerCase().indexOf(q.toLowerCase());
+    if (index === -1) return null;
+
+    const start = Math.max(0, index - 40);
+    const end = Math.min(cleanText.length, index + q.length + 40);
+
+    const prefix = start > 0 ? "..." : "";
+    const suffix = end < cleanText.length ? "..." : "";
+
+    return {
+      before: prefix + cleanText.substring(start, index),
+      match: cleanText.substring(index, index + q.length),
+      after: cleanText.substring(index + q.length, end) + suffix,
+    };
+  };
+
   return (
     <div className="max-w-4xl mx-auto w-full px-4 py-10 flex flex-col gap-8">
       {/* Search Input Section */}
@@ -188,17 +207,38 @@ export default function SearchPage() {
                           setIsOpen(false);
                           navigate(`/${item.id}`);
                         }}
-                        className="flex items-center justify-between w-full px-3 py-2.5 text-sm text-left rounded-lg hover:bg-accent hover:text-foreground transition-colors group"
+                        className="flex flex-col w-full px-3 py-2.5 text-sm text-left rounded-lg hover:bg-accent hover:text-foreground transition-colors group"
                       >
-                        <span className="font-medium truncate mr-2">
-                          {item.title || "Untitled Paste"}
-                        </span>
-                        <Badge
-                          variant="secondary"
-                          className="text-[9px] font-bold lowercase opacity-60 px-1.5 h-4 bg-accent/50"
-                        >
-                          {item.syntax}
-                        </Badge>
+                        <div className="flex items-center justify-between w-full">
+                          <span className="font-medium truncate mr-2">
+                            {item.title || "Untitled Paste"}
+                          </span>
+                          <Badge
+                            variant="secondary"
+                            className="text-[9px] font-bold lowercase opacity-60 px-1.5 h-4 bg-accent/50"
+                          >
+                            {item.syntax}
+                          </Badge>
+                        </div>
+                        {item.matchType === "content" && item.snippet && (
+                          <div className="mt-1.5 px-2 py-1 rounded border border-primary/10 text-[10px] font-mono text-muted-foreground truncate w-full bg-primary/[0.02]">
+                            {(() => {
+                              const q = localQuery.trim().toLowerCase();
+                              const text = item.snippet;
+                              const index = text.toLowerCase().indexOf(q);
+                              if (index === -1) return text;
+                              return (
+                                <>
+                                  {text.substring(0, index)}
+                                  <span className="text-primary font-bold">
+                                    {text.substring(index, index + q.length)}
+                                  </span>
+                                  {text.substring(index + q.length)}
+                                </>
+                              );
+                            })()}
+                          </div>
+                        )}
                       </button>
                     ))}
                     <div className="border-t border-border/40 my-1" />
@@ -329,6 +369,23 @@ export default function SearchPage() {
                       {(paste.text.length / 1024).toFixed(1)} KB
                     </span>
                   </div>
+
+                  {initialQuery && getSnippet(paste.text, initialQuery) && (
+                    <div className="mt-2 px-2.5 py-1.5  rounded-md border border-primary/10 text-[11px] font-mono text-muted-foreground truncate w-full">
+                      {(() => {
+                        const s = getSnippet(paste.text, initialQuery)!;
+                        return (
+                          <>
+                            {s.before}
+                            <span className="text-primary font-bold px-0.5">
+                              {s.match}
+                            </span>
+                            {s.after}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </div>
               </Link>
             ))}
