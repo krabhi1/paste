@@ -2,20 +2,17 @@ import type { Route } from ".react-router/types/app/routes/+types/paste";
 import {
   Copy,
   Calendar,
-  Code,
   User,
   Clock,
   Download,
   FileText,
   Flag,
-  Edit,
-  GitBranch,
-  Trash2,
   Check,
+  Share2,
 } from "lucide-react";
 import { getPasteById } from "~/db/queries";
 import { useState } from "react";
-import { useFetcher, Link } from "react-router";
+import { useFetcher } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
@@ -46,6 +43,7 @@ export async function action({ request }: Route.ActionArgs) {
 export default function Page({ loaderData }: Route.ComponentProps) {
   const { paste } = loaderData;
   const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
   const fetcher = useFetcher();
 
   const isReported = fetcher.data?.success;
@@ -57,6 +55,16 @@ export default function Page({ loaderData }: Route.ComponentProps) {
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy text: ", err);
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setShared(true);
+      setTimeout(() => setShared(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy URL: ", err);
     }
   };
 
@@ -87,56 +95,43 @@ export default function Page({ loaderData }: Route.ComponentProps) {
   return (
     <div className="w-full flex-grow p-3 sm:p-6 bg-background">
       <div className="max-w-6xl mx-auto w-full lg:h-full lg:flex lg:flex-col">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold break-all">
-                {paste.title || "Untitled Paste"}
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                ID: {paste.id}
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                onClick={handleCopy}
-                variant={copied ? "default" : "secondary"}
-                size="sm"
-              >
-                {copied ? (
-                  <Check className="w-4 h-4 mr-2" />
-                ) : (
-                  <Copy className="w-4 h-4 mr-2" />
-                )}
-                {copied ? "Copied!" : "Copy"}
-              </Button>
-            </div>
+        {/* Header Section */}
+        <div className="mb-6 px-1">
+          <div className="flex flex-col gap-1 mb-4">
+            <h1 className="text-2xl sm:text-3xl font-bold break-all">
+              {paste.title || "Untitled Paste"}
+            </h1>
+            <p className="text-xs font-mono text-muted-foreground/60">
+              ID: {paste.id}
+            </p>
           </div>
 
-          {/* Metadata */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                <span className="font-semibold">Created:</span>{" "}
+          {/* Metadata Grid */}
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Calendar className="w-3.5 h-3.5" />
+              <span className="text-xs">
+                <span className="font-semibold text-foreground/70">
+                  Created:
+                </span>{" "}
                 {formatDate(paste.createdAt)}
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <User className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                {paste.text.length} characters
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <User className="w-3.5 h-3.5" />
+              <span className="text-xs font-medium">
+                {paste.text.length} chars
               </span>
             </div>
 
             {paste.expiresAt && (
-              <div className="flex items-center gap-2">
-                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
-                  <span className="font-semibold">Expires:</span>{" "}
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <Clock className="w-3.5 h-3.5" />
+                <span className="text-xs">
+                  <span className="font-semibold text-foreground/70">
+                    Expires:
+                  </span>{" "}
                   {formatDate(paste.expiresAt)}
                 </span>
               </div>
@@ -144,37 +139,95 @@ export default function Page({ loaderData }: Route.ComponentProps) {
           </div>
         </div>
 
-        <Separator className="mb-6" />
-        {/* Code Content */}
-        <Card className="lg:flex-grow lg:flex lg:flex-col lg:min-h-0">
-          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between space-y-0 pb-3 border-b gap-4">
-            <Badge variant="secondary">{paste.syntax || "plaintext"}</Badge>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" asChild>
+        <Separator className="mb-6 opacity-50" />
+
+        {/* Code View with Toolbar */}
+        <Card className="lg:flex-grow lg:flex lg:flex-col lg:min-h-0 py-3">
+          <CardHeader className="flex flex-row items-center justify-between [.border-b]:pb-3  px-3 sm:px-4 border-b bg-card/50">
+            <div className="flex items-center gap-2">
+              <Badge
+                variant="secondary"
+                className="text-[10px] uppercase font-bold tracking-wider"
+              >
+                {paste.syntax || "plaintext"}
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* Copy Content */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleCopy}
+                title="Copy Content"
+                className="size-8"
+              >
+                {copied ? (
+                  <Check className="size-4" />
+                ) : (
+                  <Copy className="size-4" />
+                )}
+              </Button>
+
+              {/* Share Link */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleShare}
+                title="Copy Link"
+                className="size-8"
+              >
+                {shared ? (
+                  <Check className="size-4" />
+                ) : (
+                  <Share2 className="size-4" />
+                )}
+              </Button>
+
+              <div className="w-px h-4 bg-border mx-1 hidden sm:block" />
+
+              {/* View Raw */}
+              <Button
+                variant="ghost"
+                size="icon"
+                asChild
+                title="View Raw"
+                className="size-8"
+              >
                 <a href={`/raw/${paste.id}`} target="_blank" rel="noreferrer">
-                  <FileText className="w-4 h-4 mr-2" />
-                  View Raw
+                  <FileText className="size-4" />
                 </a>
               </Button>
-              <Button variant="outline" size="sm" onClick={handleDownload}>
-                <Download className="w-4 h-4 mr-2" />
-                Download
+
+              {/* Download */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleDownload}
+                title="Download"
+                className="size-8"
+              >
+                <Download className="size-4" />
               </Button>
-              <fetcher.Form method="post">
+
+              {/* Report */}
+              <fetcher.Form method="post" className="flex">
                 <input type="hidden" name="intent" value="report" />
                 <Button
-                  variant={isReported ? "secondary" : "destructive"}
-                  size="sm"
+                  variant="ghost"
+                  size="icon"
                   disabled={isReported || fetcher.state !== "idle"}
+                  title={isReported ? "Reported" : "Report"}
+                  className={`size-8 ${isReported ? "text-primary" : "hover:text-destructive"}`}
                 >
-                  <Flag className="w-4 h-4 mr-2" />
-                  {isReported ? "Reported" : "Report"}
+                  <Flag className="size-4 fill-current" />
                 </Button>
               </fetcher.Form>
             </div>
           </CardHeader>
-          <CardContent className="lg:flex-grow p-0 lg:overflow-auto">
-            <pre className="p-4 font-mono text-sm leading-relaxed whitespace-pre text-foreground bg-transparent border-none m-0 overflow-x-auto lg:overflow-auto">
+
+          <CardContent className="lg:flex-grow p-0 lg:overflow-auto bg-card/30">
+            <pre className="p-4 sm:p-6 font-mono text-sm leading-relaxed whitespace-pre text-foreground bg-transparent border-none m-0 overflow-x-auto lg:overflow-auto selection:bg-primary/20">
               {paste.text}
             </pre>
           </CardContent>

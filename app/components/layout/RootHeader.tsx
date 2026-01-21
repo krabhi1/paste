@@ -38,7 +38,7 @@ export default function RootHeader() {
               className="h-9 w-9 sm:h-9 sm:w-auto sm:px-4 p-0"
             >
               <PlusIcon className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">New Paste</span>
+              <span className="hidden sm:inline">New</span>
             </Button>
           </Link>
 
