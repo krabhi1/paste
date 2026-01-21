@@ -86,7 +86,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="w-full flex-grow p-3 sm:p-6 bg-background">
-      <div className="max-w-4xl mx-auto w-full h-full flex flex-col">
+      <div className=" mx-auto w-full lg:h-full lg:flex lg:flex-col">
         {/* Header */}
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
@@ -146,7 +146,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 
         <Separator className="mb-6" />
         {/* Code Content */}
-        <Card className="flex-grow flex flex-col min-h-0">
+        <Card className="lg:flex-grow lg:flex lg:flex-col lg:min-h-0">
           <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between space-y-0 pb-3 border-b gap-4">
             <Badge variant="secondary">{paste.syntax || "plaintext"}</Badge>
             <div className="flex flex-wrap gap-2">
@@ -173,8 +173,8 @@ export default function Page({ loaderData }: Route.ComponentProps) {
               </fetcher.Form>
             </div>
           </CardHeader>
-          <CardContent className="flex-grow p-0 overflow-auto">
-            <pre className="p-4 font-mono text-sm leading-relaxed whitespace-pre text-foreground bg-transparent border-none m-0 overflow-auto">
+          <CardContent className="lg:flex-grow p-0 lg:overflow-auto">
+            <pre className="p-4 font-mono text-sm leading-relaxed whitespace-pre text-foreground bg-transparent border-none m-0 overflow-x-auto lg:overflow-auto">
               {paste.text}
             </pre>
           </CardContent>

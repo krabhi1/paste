@@ -9,19 +9,24 @@ export async function loader({ request }: Route.LoaderArgs) {
   const pasteList = await getLatestPastes(10);
   return { pasteList };
 }
+
 export default function PublicLayout({ loaderData }: Route.ComponentProps) {
   const { pasteList } = loaderData;
   return (
-    <div className="flex flex-col lg:flex-row flex-1 min-h-0 gap-6">
-      <div className="flex-1 min-h-0 overflow-auto">
+    <div className="flex flex-col lg:flex-row flex-1 lg:min-h-0 gap-6 lg:gap-8">
+      {/* Content Area: Independent scroll on desktop, natural on mobile */}
+      <div className="flex-1 lg:min-h-0 lg:overflow-auto">
         <Outlet />
       </div>
-      <aside className="w-full lg:w-72 flex-shrink-0 h-[300px] lg:h-full pb-8 lg:pb-0">
+
+      {/* Sidebar: Natural flow on mobile, fixed/scrollable on desktop */}
+      <aside className="w-full lg:w-72 flex-shrink-0 lg:h-full lg:overflow-hidden pb-12 lg:pb-0 border-t lg:border-t-0 lg:border-l border-border/40">
         <PublicList list={pasteList} />
       </aside>
     </div>
   );
 }
+
 function PublicList({ list }: { list: Paste[] }) {
   const formatTimeAgo = (date: Date) => {
     if (isNaN(date.getTime())) return "Invalid date";
@@ -39,65 +44,49 @@ function PublicList({ list }: { list: Paste[] }) {
     return `${Math.floor(diffInMinutes / 1440)}d ago`;
   };
 
-  const truncateText = (text: string, maxLength: number = 60) => {
-    return text.length > maxLength
-      ? text.substring(0, maxLength) + "..."
-      : text;
-  };
-
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="px-4 pt-4 pb-2">
+    <div className="flex flex-col lg:h-full">
+      {/* Sidebar Header */}
+      <div className="px-4 pt-5 pb-3">
         <div className="flex items-center gap-2">
-          <FileTextIcon className="w-4 h-4 text-muted-foreground/70" />
-          <h3 className="text-xs font-bold text-muted-foreground/70 tracking-tight uppercase">
-            Recent Pastes
+          <FileTextIcon className="w-4 h-4 text-muted-foreground/60" />
+          <h3 className="text-xs font-bold text-muted-foreground/60 tracking-widest uppercase">
+            Recent Activity
           </h3>
         </div>
       </div>
 
-      {/* List */}
-      <div className="flex-1 min-h-0 overflow-auto p-0">
+      {/* List Container: Scrollable only on desktop */}
+      <div className="flex-1 lg:min-h-0 lg:overflow-auto">
         {list.length === 0 ? (
-          <div className="p-4 text-center">
-            <p className="text-sm text-muted-foreground">No pastes yet</p>
+          <div className="p-8 text-center">
+            <p className="text-sm text-muted-foreground">No recent activity</p>
           </div>
         ) : (
           <div className="flex flex-col">
             {list.map((paste, index) => (
               <div key={paste.id}>
-                <Link to={`/${paste.id}`} className="no-underline text-inherit">
-                  <div className="p-4 cursor-pointer transition-colors hover:bg-muted/50">
-                    <div className="flex flex-col gap-1">
-                      {/* Title */}
-                      <p className="text-sm font-medium text-foreground leading-tight">
-                        {paste.title || "Untitled"}
+                <Link
+                  to={`/${paste.id}`}
+                  className="no-underline text-inherit group"
+                >
+                  <div className="p-4 cursor-pointer transition-all hover:bg-accent/30 lg:hover:bg-accent/20">
+                    <div className="flex flex-col gap-1.5">
+                      <p className="text-sm font-semibold text-foreground leading-tight truncate group-hover:text-primary transition-colors">
+                        {paste.title || "Untitled Paste"}
                       </p>
-
-                      {/* Meta info */}
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-1">
-                          <ClockIcon className="w-3 h-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">
-                            {formatTimeAgo(paste.createdAt)}
-                          </span>
-                        </div>
-
-                        {/*<div className="flex items-center gap-1">
-                          <CodeIcon className="w-3 h-3 text-muted-foreground" />
-                          <Badge
-                            variant="outline"
-                            className="text-[10px] h-4 px-1"
-                          >
-                            {paste.syntax || "txt"}
-                          </Badge>
-                        </div>*/}
+                      <div className="flex items-center gap-2">
+                        <ClockIcon className="w-3 h-3 text-muted-foreground/70" />
+                        <span className="text-[11px] font-medium text-muted-foreground/70">
+                          {formatTimeAgo(paste.createdAt)}
+                        </span>
                       </div>
                     </div>
                   </div>
                 </Link>
-                {index < list.length - 1 && <Separator />}
+                {index < list.length - 1 && (
+                  <Separator className="mx-4 opacity-40" />
+                )}
               </div>
             ))}
           </div>
