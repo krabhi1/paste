@@ -13,15 +13,17 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function PublicLayout({ loaderData }: Route.ComponentProps) {
   const { pasteList } = loaderData;
   return (
-    <div className="flex flex-col lg:flex-row flex-1 lg:min-h-0 gap-6 lg:gap-8 max-w-screen-xl mx-auto w-full px-4 md:px-6">
-      {/* Content Area: Independent scroll on desktop, natural on mobile */}
-      <div className="flex-1 lg:min-h-0 lg:overflow-auto">
+    <div className="flex flex-col lg:flex-row flex-1 gap-6 lg:gap-8 max-w-screen-xl mx-auto w-full px-4 md:px-6 py-4 md:py-6">
+      {/* Main Content: Flows naturally with page scroll */}
+      <div className="flex-1 min-w-0">
         <Outlet />
       </div>
 
-      {/* Sidebar: Natural flow on mobile, fixed/scrollable on desktop */}
-      <aside className="w-full lg:w-72 flex-shrink-0 lg:h-full lg:overflow-hidden pb-12 lg:pb-0 border-t lg:border-t-0 lg:border-l border-border/40">
-        <PublicList list={pasteList} />
+      {/* Sidebar: Sticky on desktop, flows below content on mobile */}
+      <aside className="w-full lg:w-72 flex-shrink-0 pb-12 lg:pb-0">
+        <div className="lg:sticky lg:top-[88px]">
+          <PublicList list={pasteList} />
+        </div>
       </aside>
     </div>
   );
@@ -45,18 +47,18 @@ function PublicList({ list }: { list: Paste[] }) {
   };
 
   return (
-    <div className="flex flex-col lg:h-full">
+    <div className="flex flex-col bg-card/20 rounded-xl border border-border/40 overflow-hidden">
       {/* Sidebar Header */}
       <div className="px-4 pt-5 pb-3">
         <div className="flex items-center gap-2">
           <FileTextIcon className="w-4 h-4 text-muted-foreground/60" />
-          <h3 className="text-xs font-bold text-muted-foreground/60 tracking-widest uppercase">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
             Recent Activity
           </h3>
         </div>
       </div>
 
-      <div className="flex-1">
+      <div className="flex flex-col">
         {list.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-sm text-muted-foreground">No recent activity</p>
@@ -69,7 +71,7 @@ function PublicList({ list }: { list: Paste[] }) {
                   to={`/${paste.id}`}
                   className="no-underline text-inherit group"
                 >
-                  <div className="p-4 cursor-pointer transition-all hover:bg-accent/30 lg:hover:bg-accent/20">
+                  <div className="p-4 cursor-pointer transition-all hover:bg-primary/[0.03]">
                     <div className="flex flex-col gap-1.5">
                       <p className="text-sm font-semibold text-foreground leading-tight truncate group-hover:text-primary transition-colors">
                         {paste.title || "Untitled Paste"}
