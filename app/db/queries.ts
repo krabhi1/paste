@@ -1,7 +1,7 @@
 import { type Paste, pastes } from "./schema";
 import { db } from ".";
 import { pasteId } from "~/lib/utils";
-import { eq, desc, sql, or, isNull, gt, and } from "drizzle-orm";
+import { eq, desc, sql, or, isNull, gt, and, gte, lte } from "drizzle-orm";
 
 /**
  * Calculates the expiration date based on the user's selection.
@@ -95,23 +95,91 @@ export async function getLatestPastesByPage(page: number, limit: number) {
     .offset((page - 1) * limit);
 }
 
-export async function searchPastes(query: string, page: number, limit: number) {
-  if (!query.trim()) return [];
+export interface SearchFilters {
+  query?: string;
+  syntax?: string;
+  from?: Date;
+  to?: Date;
+}
 
-  const pattern = `%${query}%`;
+/**
+ * Advanced search with pagination and filters.
+ */
+export async function searchPastes(
+  filters: SearchFilters,
+  page: number = 1,
+  limit: number = 10,
+) {
+  const conditions = [notExpired()];
+
+  if (filters.query?.trim()) {
+    const pattern = `%${filters.query.trim()}%`;
+    conditions.push(
+      or(
+        sql`LOWER(${pastes.title}) LIKE LOWER(${pattern})`,
+        sql`LOWER(${pastes.text}) LIKE LOWER(${pattern})`,
+      )!,
+    );
+  }
+
+  if (
+    filters.syntax &&
+    filters.syntax !== "all" &&
+    filters.syntax !== "plaintext"
+  ) {
+    conditions.push(eq(pastes.syntax, filters.syntax));
+  }
+
+  if (filters.from) {
+    conditions.push(gte(pastes.createdAt, filters.from));
+  }
+
+  if (filters.to) {
+    conditions.push(lte(pastes.createdAt, filters.to));
+  }
+
+  const whereClause = and(...conditions);
+
+  const [results, total] = await Promise.all([
+    db()
+      .select()
+      .from(pastes)
+      .where(whereClause)
+      .orderBy(desc(pastes.createdAt))
+      .limit(limit)
+      .offset((page - 1) * limit),
+    db()
+      .select({ count: sql<number>`count(*)` })
+      .from(pastes)
+      .where(whereClause),
+  ]);
+
+  const count = total[0]?.count || 0;
+
+  return {
+    results,
+    total: count,
+    page,
+    totalPages: Math.ceil(count / limit),
+  };
+}
+
+/**
+ * Quick title-only search for header suggestions.
+ */
+export async function getSearchSuggestions(query: string, limit: number = 5) {
+  if (!query.trim()) return [];
+  const pattern = `%${query.trim()}%`;
 
   return db()
-    .select()
+    .select({
+      id: pastes.id,
+      title: pastes.title,
+      syntax: pastes.syntax,
+    })
     .from(pastes)
     .where(
-      and(
-        notExpired(),
-        or(
-          sql`LOWER(${pastes.title}) LIKE LOWER(${pattern})`,
-          sql`LOWER(${pastes.text}) LIKE LOWER(${pattern})`,
-        ),
-      ),
+      and(notExpired(), sql`LOWER(${pastes.title}) LIKE LOWER(${pattern})`),
     )
-    .limit(limit)
-    .offset((page - 1) * limit);
+    .limit(limit);
 }

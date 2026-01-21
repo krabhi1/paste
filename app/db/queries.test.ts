@@ -65,11 +65,12 @@ describe("Database Queries", () => {
     await createPaste({ text: "Hello, World!", title: "Greeting" });
     await createPaste({ text: "Hello, Universe!", title: "Cosmos" });
     await createPaste({ text: "Goodbye, World!", title: "Farewell" });
-    const results = await searchPastes(searchTerm, 1, 10);
+    const { results } = await searchPastes({ query: searchTerm }, 1, 10);
     expect(results.length).toBeGreaterThan(0);
     for (const paste of results) {
       expect(
-        paste.text.includes(searchTerm) || paste.title.includes(searchTerm),
+        paste.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          paste.title.toLowerCase().includes(searchTerm.toLowerCase()),
       ).toBe(true);
     }
   });
@@ -80,10 +81,18 @@ describe("Database Queries", () => {
     await createPaste({ text: "MiXeD cAsE tExT", title: "Case Test 3" });
 
     // Search with lowercase
-    const lowerResults = await searchPastes("text", 1, 10);
+    const { results: lowerResults } = await searchPastes(
+      { query: "text" },
+      1,
+      10,
+    );
 
     // Search with uppercase
-    const upperResults = await searchPastes("TEXT", 1, 10);
+    const { results: upperResults } = await searchPastes(
+      { query: "TEXT" },
+      1,
+      10,
+    );
 
     // Verify both searches return the same results
     expect(lowerResults.length).toBeGreaterThan(0);
@@ -110,9 +119,13 @@ describe("Database Queries", () => {
     // Test multiple search terms with different cases
     const searchTerms = ["Fox", "DOG"];
 
-    let results: Awaited<ReturnType<typeof searchPastes>> = [];
+    let results: any[] = [];
     for (const term of searchTerms) {
-      const termResults = await searchPastes(term, 1, 10);
+      const { results: termResults } = await searchPastes(
+        { query: term },
+        1,
+        10,
+      );
       results = [...results, ...termResults];
     }
 
