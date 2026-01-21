@@ -86,7 +86,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="w-full flex-grow p-3 sm:p-6 bg-background">
-      <div className=" mx-auto w-full lg:h-full lg:flex lg:flex-col">
+      <div className="max-w-6xl mx-auto w-full lg:h-full lg:flex lg:flex-col">
         {/* Header */}
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">

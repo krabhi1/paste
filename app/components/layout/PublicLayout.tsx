@@ -13,7 +13,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function PublicLayout({ loaderData }: Route.ComponentProps) {
   const { pasteList } = loaderData;
   return (
-    <div className="flex flex-col lg:flex-row flex-1 lg:min-h-0 gap-6 lg:gap-8">
+    <div className="flex flex-col lg:flex-row flex-1 lg:min-h-0 gap-6 lg:gap-8 max-w-screen-xl mx-auto w-full px-4 md:px-6">
       {/* Content Area: Independent scroll on desktop, natural on mobile */}
       <div className="flex-1 lg:min-h-0 lg:overflow-auto">
         <Outlet />
@@ -56,8 +56,7 @@ function PublicList({ list }: { list: Paste[] }) {
         </div>
       </div>
 
-      {/* List Container: Scrollable only on desktop */}
-      <div className="flex-1 lg:min-h-0 lg:overflow-auto">
+      <div className="flex-1">
         {list.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-sm text-muted-foreground">No recent activity</p>
