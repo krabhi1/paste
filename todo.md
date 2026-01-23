@@ -42,3 +42,4 @@
 - [x] Change Recent Activity name to Recent Pastes
 - [x] Remove animation from New Paste button
 - [x] Search Input height should be smaller
+- [x] Add content to /about page
