@@ -178,7 +178,7 @@ export default function SearchPage() {
                 setIsOpen(true)
               }
               placeholder="Search by title or content..."
-              className="pl-12 py-7 text-lg rounded-xl border-border bg-card/40 focus-visible:ring-primary/20 transition-all"
+              className="pl-12 py-5 text-lg rounded-xl border-border bg-card/40 focus-visible:ring-primary/20 transition-all"
               autoComplete="off"
             />
             <div
@@ -207,7 +207,7 @@ export default function SearchPage() {
                           setIsOpen(false);
                           navigate(`/${item.id}`);
                         }}
-                        className="flex flex-col w-full px-3 py-2.5 text-sm text-left rounded-lg hover:bg-accent hover:text-foreground transition-colors group"
+                        className="flex flex-col w-full px-3 py-2.5 text-sm text-left rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors group"
                       >
                         <div className="flex items-center justify-between w-full">
                           <span className="font-medium truncate mr-2">
@@ -244,7 +244,7 @@ export default function SearchPage() {
                     <div className="border-t border-border/40 my-1" />
                     <button
                       onClick={handleSearch}
-                      className="flex items-center w-full px-3 py-2 text-xs font-semibold text-primary hover:bg-accent rounded-lg transition-colors"
+                      className="flex items-center w-full px-3 py-2 text-xs font-semibold text-primary hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
                     >
                       Search for "{localQuery}"
                     </button>

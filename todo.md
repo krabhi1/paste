@@ -34,3 +34,11 @@
 - [ ] **Favicon & Branding**: Design a simple favicon and update site branding.
 - [ ] **Documentation**: Create a README with setup instructions, features, and contribution guidelines.
 - [ ] **Deployment Checklist**: Finalize Cloudflare Workers deployment settings, including environment variables and KV/D1 configurations.
+
+## Minor fixes
+
+- [x] Use light color for active, hover state of UI elements
+- [x] Recent paste list items should be smaller in height
+- [x] Change Recent Activity name to Recent Pastes
+- [x] Remove animation from New Paste button
+- [x] Search Input height should be smaller

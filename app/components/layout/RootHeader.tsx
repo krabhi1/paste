@@ -59,12 +59,8 @@ export default function RootHeader() {
           {!isHome && (
             <div className="flex items-center ml-1 sm:ml-2 border-l pl-2 sm:pl-4 border-border/50">
               <Link to="/" className="no-underline">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="h-9 px-3 sm:px-4 shadow-none border group"
-                >
-                  <PlusIcon className="w-4 h-4 sm:mr-2 transition-transform group-hover:rotate-90" />
+                <Button size="sm">
+                  <PlusIcon className="w-4 h-4 sm:mr-2" />
                   <span className="hidden sm:inline">New</span>
                 </Button>
               </Link>

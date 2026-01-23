@@ -53,7 +53,7 @@ function PublicList({ list }: { list: Paste[] }) {
         <div className="flex items-center gap-2">
           <FileTextIcon className="w-4 h-4 text-muted-foreground/60" />
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
-            Recent Activity
+            Recent Pastes
           </h3>
         </div>
       </div>
@@ -61,7 +61,7 @@ function PublicList({ list }: { list: Paste[] }) {
       <div className="flex flex-col">
         {list.length === 0 ? (
           <div className="p-8 text-center">
-            <p className="text-sm text-muted-foreground">No recent activity</p>
+            <p className="text-sm text-muted-foreground">No recent pastes</p>
           </div>
         ) : (
           <div className="flex flex-col">
@@ -71,7 +71,7 @@ function PublicList({ list }: { list: Paste[] }) {
                   to={`/${paste.id}`}
                   className="no-underline text-inherit group"
                 >
-                  <div className="p-4 cursor-pointer transition-all hover:bg-primary/[0.03]">
+                  <div className="px-4 py-2.5 cursor-pointer transition-all hover:bg-accent hover:text-accent-foreground">
                     <div className="flex flex-col gap-1.5">
                       <p className="text-sm font-semibold text-foreground leading-tight truncate group-hover:text-primary transition-colors">
                         {paste.title || "Untitled Paste"}
