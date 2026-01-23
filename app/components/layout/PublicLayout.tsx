@@ -1,13 +1,16 @@
 import type { Route } from ".react-router/types/app/components/layout/+types/PublicLayout";
-import { Outlet, Link } from "react-router";
+import { Outlet, Link, Await } from "react-router";
+import { Suspense } from "react";
 import { getLatestPastes } from "~/db/queries";
 import type { Paste } from "~/db/schema";
 import { ClockIcon, FileTextIcon } from "lucide-react";
 import { Separator } from "~/components/ui/separator";
+import { Skeleton } from "~/components/ui/skeleton";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const pasteList = await getLatestPastes(10);
-  return { pasteList };
+  return {
+    pasteList: getLatestPastes(10),
+  };
 }
 
 export default function PublicLayout({ loaderData }: Route.ComponentProps) {
@@ -22,9 +25,39 @@ export default function PublicLayout({ loaderData }: Route.ComponentProps) {
       {/* Sidebar: Sticky on desktop, flows below content on mobile */}
       <aside className="w-full lg:w-72 flex-shrink-0 pb-12 lg:pb-0">
         <div className="lg:sticky lg:top-[88px]">
-          <PublicList list={pasteList} />
+          <Suspense fallback={<PublicListSkeleton />}>
+            <Await resolve={pasteList}>
+              {(resolvedList) => <PublicList list={resolvedList} />}
+            </Await>
+          </Suspense>
         </div>
       </aside>
+    </div>
+  );
+}
+
+function PublicListSkeleton() {
+  return (
+    <div className="flex flex-col bg-card/20 rounded-xl border border-border/40 overflow-hidden">
+      <div className="px-4 pt-5 pb-3">
+        <div className="flex items-center gap-2">
+          <FileTextIcon className="w-4 h-4 text-muted-foreground/40" />
+          <Skeleton className="h-2.5 w-24" />
+        </div>
+      </div>
+      <div className="flex flex-col">
+        {[...Array(8)].map((_, i) => (
+          <div key={i}>
+            <div className="px-4 py-2.5">
+              <div className="flex flex-col gap-1.5">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/4" />
+              </div>
+            </div>
+            {i < 7 && <Separator className="mx-4 opacity-40" />}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
