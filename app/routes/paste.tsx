@@ -9,6 +9,7 @@ import {
   Flag,
   Check,
   Share2,
+  WrapText,
 } from "lucide-react";
 import { getPasteById } from "~/db/queries";
 import { useState } from "react";
@@ -17,6 +18,7 @@ import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
+import { cn } from "~/lib/utils";
 
 export const meta: Route.MetaFunction = ({ data }) => {
   if (!data || !("paste" in data)) {
@@ -64,6 +66,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
   const { paste } = loaderData;
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
+  const [isWrapped, setIsWrapped] = useState(paste.syntax === "plaintext");
   const fetcher = useFetcher();
 
   const isReported = fetcher.data?.success;
@@ -206,6 +209,22 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 
               <div className="w-px h-4 bg-border mx-1 hidden sm:block" />
 
+              {/* Toggle Wrap */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsWrapped(!isWrapped)}
+                title={isWrapped ? "Disable Wrap" : "Enable Wrap"}
+                className={cn(
+                  "size-8",
+                  isWrapped && "bg-accent text-accent-foreground",
+                )}
+              >
+                <WrapText className="size-4" />
+              </Button>
+
+              <div className="w-px h-4 bg-border mx-1 hidden sm:block" />
+
               {/* View Raw */}
               <Button
                 variant="ghost"
@@ -247,7 +266,14 @@ export default function Page({ loaderData }: Route.ComponentProps) {
           </CardHeader>
 
           <CardContent className="lg:flex-grow p-0 bg-card/30 max-h-[70vh] overflow-y-auto">
-            <pre className="p-4 sm:p-6 font-mono text-sm leading-relaxed whitespace-pre text-foreground bg-transparent border-none m-0 overflow-x-auto selection:bg-primary/20">
+            <pre
+              className={cn(
+                "p-4 sm:p-6 font-mono text-sm leading-relaxed text-foreground bg-transparent border-none m-0 selection:bg-primary/20",
+                isWrapped
+                  ? "whitespace-pre-wrap break-words"
+                  : "whitespace-pre overflow-x-auto",
+              )}
+            >
               {paste.text}
             </pre>
           </CardContent>
