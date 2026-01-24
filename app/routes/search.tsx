@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef, Suspense } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
+import { formatRelativeTime } from "~/lib/utils";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Search Public Pastes | Paste" }];
@@ -127,22 +128,6 @@ export default function SearchPage() {
       else newParams.set(key, value);
     });
     setSearchParams(newParams);
-  };
-
-  const formatTimeAgo = (date: string | Date) => {
-    const now = new Date();
-    const d = new Date(date);
-    const diffInMinutes = Math.floor(
-      (now.getTime() - d.getTime()) / (1000 * 60),
-    );
-    if (diffInMinutes < 1) return "Just now";
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    return d.toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
   };
 
   const getSnippet = (text: string, q: string) => {
@@ -381,7 +366,7 @@ export default function SearchPage() {
                           <div className="flex items-center gap-4 text-xs font-medium text-muted-foreground">
                             <span className="flex items-center gap-1.5">
                               <Clock className="w-3.5 h-3.5" />
-                              {formatTimeAgo(paste.createdAt)}
+                              {formatRelativeTime(paste.createdAt)}
                             </span>
                             <span className="flex items-center gap-1.5">
                               <FileCode className="w-3.5 h-3.5" />

@@ -9,6 +9,7 @@
 - [x] Use light color for active, hover state of UI elements
 - [x] Recent paste list items should be smaller in height
 - [x] Change Recent Activity name to Recent Pastes
+- [x] Fix CreatedAt relative time (except paste page): display shorthand units (m, h, d, mo, y).
 - [x] Remove animation from New Paste button
 - [x] Search Input height should be smaller
 - [x] Add content to /about page

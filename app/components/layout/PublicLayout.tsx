@@ -6,6 +6,7 @@ import type { Paste } from "~/db/schema";
 import { ClockIcon, FileTextIcon } from "lucide-react";
 import { Separator } from "~/components/ui/separator";
 import { Skeleton } from "~/components/ui/skeleton";
+import { formatRelativeTime } from "~/lib/utils";
 
 export async function loader({ request }: Route.LoaderArgs) {
   return {
@@ -63,22 +64,6 @@ function PublicListSkeleton() {
 }
 
 function PublicList({ list }: { list: Paste[] }) {
-  const formatTimeAgo = (date: Date) => {
-    if (isNaN(date.getTime())) return "Invalid date";
-
-    const now = new Date();
-    let diffInMinutes = Math.floor(
-      (now.getTime() - date.getTime()) / (1000 * 60),
-    );
-
-    if (diffInMinutes < 0) diffInMinutes = 0;
-
-    if (diffInMinutes < 1) return "Just now";
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    return `${Math.floor(diffInMinutes / 1440)}d ago`;
-  };
-
   return (
     <div className="flex flex-col bg-card/20 rounded-xl border border-border/40 overflow-hidden">
       {/* Sidebar Header */}
@@ -112,7 +97,7 @@ function PublicList({ list }: { list: Paste[] }) {
                       <div className="flex items-center gap-2">
                         <ClockIcon className="w-3 h-3 text-muted-foreground/70" />
                         <span className="text-[11px] font-medium text-muted-foreground/70">
-                          {formatTimeAgo(paste.createdAt)}
+                          {formatRelativeTime(paste.createdAt)}
                         </span>
                       </div>
                     </div>
