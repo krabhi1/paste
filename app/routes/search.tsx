@@ -30,6 +30,10 @@ import {
 import { useState, useEffect, useRef, Suspense } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
 
+export const meta: Route.MetaFunction = () => {
+  return [{ title: "Search Public Pastes | Paste" }];
+};
+
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const q = url.searchParams.get("q") || "";

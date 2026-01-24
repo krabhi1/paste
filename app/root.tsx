@@ -11,7 +11,17 @@ import type { Route } from "./+types/root";
 
 import "./app.css";
 
+export const meta: Route.MetaFunction = () => [
+  { title: "Paste — Minimal Text Sharing" },
+  {
+    name: "description",
+    content:
+      "A lightweight, edge-optimized tool for minimal text sharing. Fast, ephemeral, and simple.",
+  },
+];
+
 export const links: Route.LinksFunction = () => [
+  { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",

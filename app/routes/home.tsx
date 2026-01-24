@@ -1,5 +1,9 @@
 import type { Route } from ".react-router/types/app/routes/+types/home";
 import { redirect, useFetcher } from "react-router";
+
+export const meta: Route.MetaFunction = () => {
+  return [{ title: "Create New Paste | Paste — Minimal Text Sharing" }];
+};
 import { createPaste } from "~/db/queries";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";

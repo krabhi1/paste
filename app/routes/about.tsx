@@ -1,3 +1,9 @@
+import type { Route } from "./+types/about";
+
+export const meta: Route.MetaFunction = () => {
+  return [{ title: "About | Paste — Minimal Text Sharing" }];
+};
+
 export default function AboutPage() {
   return (
     <div className="max-w-2xl mx-auto w-full py-20 px-6">
@@ -5,9 +11,9 @@ export default function AboutPage() {
         {/* About Section */}
         <section className="space-y-4">
           <p className=" font-medium leading-relaxed text-foreground/90">
-            A lightweight tool for sharing code snippets and plain text.
-            Designed for speed and simplicity, ensuring your content is easy to
-            share, search, and read without any unnecessary bloat.
+            A lightweight tool for minimal text sharing. Designed for speed and
+            simplicity, ensuring your content is easy to share, search, and read
+            without any unnecessary bloat.
           </p>
         </section>
 

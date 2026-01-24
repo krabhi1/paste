@@ -1,4 +1,4 @@
-import { PlusIcon, BookIcon, SearchIcon, InfoIcon } from "lucide-react";
+import { PlusIcon, SearchIcon, InfoIcon } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import { Button } from "~/components/ui/button";
 
@@ -11,10 +11,8 @@ export default function RootHeader() {
       <div className="flex items-center justify-between px-4 md:px-6 py-2 md:py-3 mx-auto max-w-screen-xl">
         {/* Left Section: Logo */}
         <Link to="/" className="no-underline text-foreground shrink-0">
-          <div className="flex items-center gap-2 group">
-            <div className="rounded-md p-1.5 bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
-              <BookIcon className="w-5 h-5" />
-            </div>
+          <div className="flex items-center gap-2">
+            <img src="/favicon.svg" alt="" className="w-5 h-5" />
             <span className="text-xl font-bold tracking-tight">Paste</span>
           </div>
         </Link>

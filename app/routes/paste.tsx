@@ -18,6 +18,26 @@ import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 
+export const meta: Route.MetaFunction = ({ data }) => {
+  if (!data || !("paste" in data)) {
+    return [{ title: "Paste Not Found | Paste" }];
+  }
+
+  const title = data.paste.title || "Untitled Paste";
+  const description =
+    data.paste.text.slice(0, 150).replace(/\s+/g, " ").trim() +
+    (data.paste.text.length > 150 ? "..." : "");
+
+  return [
+    { title: `${title} | Paste` },
+    { name: "description", content: description },
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "article" },
+    { name: "twitter:card", content: "summary" },
+  ];
+};
+
 export async function loader({ params }: Route.LoaderArgs) {
   const { id } = params;
   const paste = await getPasteById(id!);

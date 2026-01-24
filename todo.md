@@ -2,6 +2,8 @@
 
 ## In Progress
 
+- [ ] Input Validation: Use Zod to validate all incoming data in `home.tsx` and `api` routes (limit title length, max text size, valid syntax, etc.).
+
 ## Completed Tasks
 
 - [x] Use light color for active, hover state of UI elements
@@ -11,6 +13,10 @@
 - [x] Search Input height should be smaller
 - [x] Add content to /about page
 - [x] Defer loading of data for public pastes and search page
+- [x] Favicon & Branding: Design a simple favicon and update site branding.
+- [x] Meta Tags: Add SEO-friendly meta tags for better search engine indexing.
+- [x] Documentation: Create a README with setup instructions, features, and contribution guidelines.
+- [x] Deployment Checklist: Finalize Cloudflare Workers deployment settings, including environment variables and KV/D1 configurations.
 
 ## UI/UX Enhancements
 
@@ -24,7 +30,6 @@
 
 ## Security & Validation
 
-- [ ] Input Validation: Use Zod to validate all incoming data in `home.tsx` and `api` routes (limit title length, max text size, valid syntax, etc.).
 - [ ] Rate Limiting: Implement rate limiting for paste creation and search suggestions to prevent abuse (utilizing Cloudflare KV or D1).
 - [ ] Bot Protection: Integrate Cloudflare Turnstile or a similar CAPTCHA on the creation form.
 - [ ] SQL Injection Prevention: Ensure all raw SQL fragments (if any) are properly parameterized (Drizzle handles most of this).
@@ -45,10 +50,6 @@
 - [ ] Cache the public pastes page using Cloudflare KV or Workers Cache API for faster load times.
 
 ## Final Touches
-
-- [ ] Favicon & Branding: Design a simple favicon and update site branding.
-- [ ] Documentation: Create a README with setup instructions, features, and contribution guidelines.
-- [ ] Deployment Checklist: Finalize Cloudflare Workers deployment settings, including environment variables and KV/D1 configurations.
 
 ## Observability
 

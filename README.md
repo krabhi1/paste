@@ -1,14 +1,32 @@
-## Paste
+# Paste
 
-A fast, minimal, and privacy‑friendly pastebin service designed for seamless sharing of text or code snippets.
-This powerful fullstack serverless application leverages cutting-edge technologies including React Router, Turso, Drizzle ORM, and Cloudflare Workers.
+This is paste app for sharing text and code snippets quickly and easily.
+I built this because I wanted a simple, clean place to share text and code without any extra noise or bloat. It's designed to be fast, minimal with modern looks.
 
-### Tech Stack
+### Why use this?
 
-- React Router v7 (Fullstack mode) - Enabling robust client and server-side routing
-- Turso - Efficient SQLite database distributed at the edge
-- Drizzle ORM - Type-safe SQL query builder for enhanced database interactions
-- Cloudflare Workers - Serverless execution environment for optimal performance
-- Radix UI - Composable and accessible component system
+- **Speed**: Built on the edge (Cloudflare Workers) so it loads instantly.
+- **Search**: A quick search that actually works across titles and content.
+- **Privacy**: Set your pastes to expire automatically whenever you want.
+- **Clean**: No tracking, no ads, just your text.
+- **Open Source**: Fully open source so you can see exactly how it works.
 
-[📋 View our Progress on Trello](https://trello.com/b/xk8hyzLx)
+### Getting it running
+
+If you want to run this locally, you'll just need `pnpm`:
+
+```bash
+#setup the .env see .env.example for reference
+#then install deps and run
+pnpm install
+pnpm dev
+```
+
+The database uses Turso (SQLite), so make sure you have your environment variables set up if you're planning to deploy it yourself.
+
+### Tech
+
+- React Router 7
+- Cloudflare Workers
+- Turso (Drizzle ORM)
+- Tailwind CSS 4
