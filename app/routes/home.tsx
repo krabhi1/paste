@@ -1,10 +1,11 @@
 import type { Route } from ".react-router/types/app/routes/+types/home";
-import { redirect, useFetcher } from "react-router";
+import { redirect, useFetcher, data } from "react-router";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Create New Paste | Paste — Minimal Text Sharing" }];
 };
 import { createPaste } from "~/db/queries";
+import { PasteSchema } from "~/lib/validations";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -27,14 +28,16 @@ import { Loader2 } from "lucide-react";
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
-  const title = formData.get("title") as string;
-  const text = formData.get("text") as string;
-  const syntax = formData.get("syntax") as string;
-  const expiry = formData.get("expiry") as string;
+  const submission = PasteSchema.safeParse(Object.fromEntries(formData));
 
-  // TODO: add validation
-  const paste = await createPaste({ title, text, syntax, expiry });
-  console.log("Created paste:", paste);
+  if (!submission.success) {
+    return data(
+      { errors: submission.error.flatten().fieldErrors },
+      { status: 400 },
+    );
+  }
+
+  const paste = await createPaste(submission.data);
   return redirect(`/${paste.id}`);
 }
 
@@ -60,7 +63,13 @@ export default function Page({}: Route.ComponentProps) {
                 name="title"
                 placeholder="Enter a descriptive title..."
                 required
+                aria-invalid={!!fetcher.data?.errors?.title}
               />
+              {fetcher.data?.errors?.title && (
+                <p className="text-[11px] font-medium text-destructive mt-1">
+                  {fetcher.data.errors.title[0]}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -110,8 +119,14 @@ export default function Page({}: Route.ComponentProps) {
                 placeholder="Paste your code or text here..."
                 rows={12}
                 required
+                aria-invalid={!!fetcher.data?.errors?.text}
                 className="font-mono text-sm resize-vertical min-h-[200px] max-h-[500px] overflow-y-auto"
               />
+              {fetcher.data?.errors?.text && (
+                <p className="text-[11px] font-medium text-destructive mt-1">
+                  {fetcher.data.errors.text[0]}
+                </p>
+              )}
             </div>
 
             <Button type="submit" disabled={isSubmitting} className="w-full">

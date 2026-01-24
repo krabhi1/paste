@@ -30,6 +30,7 @@ import {
 import { useState, useEffect, useRef, Suspense } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
 import { formatRelativeTime } from "~/lib/utils";
+import { SearchSchema } from "~/lib/validations";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Search Public Pastes | Paste" }];
@@ -38,6 +39,10 @@ export const meta: Route.MetaFunction = () => {
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const q = url.searchParams.get("q") || "";
+  const validation = SearchSchema.safeParse({ q });
+  const errors = validation.success
+    ? null
+    : validation.error.flatten().fieldErrors;
   const syntax = url.searchParams.get("syntax") || "all";
   const time = url.searchParams.get("time") || "all";
   const page = parseInt(url.searchParams.get("page") || "1", 10);
@@ -52,17 +57,16 @@ export async function loader({ request }: Route.LoaderArgs) {
     else if (time === "30d") fromDate.setDate(fromDate.getDate() - 30);
   }
 
-  const resultsPromise = searchPastes(
-    { query: q, syntax, from: fromDate },
-    page,
-    limit,
-  );
+  const resultsPromise = errors
+    ? Promise.resolve({ results: [], total: 0, page: 1, totalPages: 0 })
+    : searchPastes({ query: q, syntax, from: fromDate }, page, limit);
 
   return {
     resultsPromise,
     query: q,
     activeSyntax: syntax,
     activeTime: time,
+    errors,
   };
 }
 
@@ -72,6 +76,7 @@ export default function SearchPage() {
     query: initialQuery,
     activeSyntax,
     activeTime,
+    errors,
   } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const fetcher = useFetcher();
@@ -154,25 +159,44 @@ export default function SearchPage() {
       {/* Search Input Section */}
       <div className="flex flex-col gap-6">
         <div className="relative" ref={containerRef}>
-          <form onSubmit={handleSearch} className="relative group">
-            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
-            <Input
-              value={localQuery}
-              onChange={(e) => setLocalQuery(e.target.value)}
-              onFocus={() =>
-                localQuery.trim().length > 0 &&
-                localQuery !== initialQuery &&
-                setIsOpen(true)
-              }
-              placeholder="Search by title or content..."
-              className="pl-12 py-5 text-lg rounded-xl border-border bg-card/40 focus-visible:ring-primary/20 transition-all"
-              autoComplete="off"
-            />
-            <div
-              className={`absolute right-4 top-1/2 -translate-y-1/2 transition-opacity duration-200 ${isLoadingSuggestions ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-            >
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground/30" />
+          <form
+            onSubmit={handleSearch}
+            className="relative group flex flex-col gap-1.5"
+          >
+            <div className="relative">
+              <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+              <Input
+                value={localQuery}
+                onChange={(e) => setLocalQuery(e.target.value)}
+                onFocus={() =>
+                  localQuery.trim().length > 0 &&
+                  localQuery !== initialQuery &&
+                  setIsOpen(true)
+                }
+                placeholder="Search by title or content..."
+                className={`pl-12 py-5 text-lg rounded-xl border-border bg-card/40 focus-visible:ring-primary/20 transition-all ${
+                  errors?.q
+                    ? "border-destructive focus-visible:ring-destructive/20"
+                    : ""
+                }`}
+                autoComplete="off"
+                aria-invalid={!!errors?.q}
+              />
+              <div
+                className={`absolute right-4 top-1/2 -translate-y-1/2 transition-opacity duration-200 ${
+                  isLoadingSuggestions
+                    ? "opacity-100"
+                    : "opacity-0 pointer-events-none"
+                }`}
+              >
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground/30" />
+              </div>
             </div>
+            {errors?.q && (
+              <p className="text-[11px] font-medium text-destructive ml-1">
+                {errors.q[0]}
+              </p>
+            )}
           </form>
 
           {/* Suggestions Dropdown */}

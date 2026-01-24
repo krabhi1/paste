@@ -2,9 +2,9 @@
 
 ## In Progress
 
-- [ ] Input Validation: Use Zod to validate all incoming data in `home.tsx` and `api` routes (limit title length, max text size, valid syntax, etc.).
-
 ## Completed Tasks
+
+- [x] Input Validation: Use Zod to validate all incoming data in `home.tsx` and `api` routes (limit title length, max text size, valid syntax, etc.).
 
 - [x] Use light color for active, hover state of UI elements
 - [x] Recent paste list items should be smaller in height

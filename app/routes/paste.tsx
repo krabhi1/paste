@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { getPasteById } from "~/db/queries";
 import { useState } from "react";
-import { useFetcher } from "react-router";
+import { useFetcher, data } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
@@ -57,7 +57,7 @@ export async function action({ request }: Route.ActionArgs) {
     return { success: true, message: "Paste reported successfully." };
   }
 
-  return { success: false };
+  return data({ success: false }, { status: 400 });
 }
 
 export default function Page({ loaderData }: Route.ComponentProps) {
