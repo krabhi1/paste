@@ -224,12 +224,6 @@ export default function SearchPage() {
                           <span className="font-medium truncate mr-2">
                             {item.title || "Untitled Paste"}
                           </span>
-                          <Badge
-                            variant="secondary"
-                            className="text-[9px] font-bold lowercase opacity-60 px-1.5 h-4 bg-accent/50"
-                          >
-                            {item.syntax}
-                          </Badge>
                         </div>
                         {item.matchType === "content" && item.snippet && (
                           <div className="mt-1.5 px-2 py-1 rounded border border-primary/10 text-[10px] font-mono text-muted-foreground truncate w-full bg-primary/[0.02]">
@@ -380,12 +374,6 @@ export default function SearchPage() {
                             <h3 className="text-[15px] font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                               {paste.title || "Untitled Paste"}
                             </h3>
-                            <Badge
-                              variant="secondary"
-                              className="h-5 px-2 text-[10px] font-bold lowercase tracking-tight shrink-0 bg-accent/50 text-muted-foreground"
-                            >
-                              {paste.syntax}
-                            </Badge>
                           </div>
                           <div className="flex items-center gap-4 text-xs font-medium text-muted-foreground">
                             <span className="flex items-center gap-1.5">

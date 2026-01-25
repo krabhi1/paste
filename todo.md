@@ -4,6 +4,7 @@
 
 ## Completed Tasks
 
+- [x] UI: remove language chip from search item
 - [x] No horizontal scroll on plain text paste in paste page. Also add wrap toggle icon button.
 
 - [x] Input Validation: Use Zod to validate all incoming data in `home.tsx` and `api` routes (limit title length, max text size, valid syntax, etc.).
