@@ -1,4 +1,6 @@
 # Paste
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/a37d9a81-5270-41ee-aeda-c5c4c3afcbfd" />
+
 
 This is paste app for sharing text and code snippets quickly and easily.
 I built this because I wanted a simple, clean place to share text and code without any extra noise or bloat. It's designed to be fast, minimal with modern looks.
