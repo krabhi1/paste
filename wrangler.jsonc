@@ -6,4 +6,11 @@
   "observability": {
     "enabled": true,
   },
+  "kv_namespaces": [
+    {
+      "binding": "paste",
+      "id": "3fbf151f058b4b0eabdbc079917033a9",
+      "preview_id": "d2ba91d1ad434799bf409d7b1c381b1b",
+    },
+  ],
 }

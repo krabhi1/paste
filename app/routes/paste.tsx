@@ -19,6 +19,8 @@ import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/lib/utils";
+import type { Paste } from "~/db/schema";
+import type { P } from "node_modules/react-router/dist/development/register-DiOIlEq5.mjs";
 
 export const meta: Route.MetaFunction = ({ data }) => {
   if (!data || !("paste" in data)) {
@@ -40,13 +42,43 @@ export const meta: Route.MetaFunction = ({ data }) => {
   ];
 };
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({ params, request, context }: Route.LoaderArgs) {
   const { id } = params;
+  // We only care about the URL, not the user's cookies/headers
+  const cacheUrl = new URL(request.url);
+  const cacheKey = new Request(cacheUrl.toString(), {
+    method: "GET",
+  });
+  // @ts-ignore
+  const cache = caches.default;
+
+  //  Check Cache
+  const cachedResponse = await cache.match(cacheKey);
+  if (cachedResponse) {
+    console.log("Cache hit:", id);
+    return (await cachedResponse.json()) as { paste: Paste };
+  }
+  // Fetch from DB
+  console.log("Cache miss:", id);
   const paste = await getPasteById(id!);
   if (!paste) {
     throw new Response("Not Found", { status: 404 });
   }
-  return { paste };
+  const data = { paste };
+
+  // Background Cache Write
+  // We use waitUntil so the response is sent to the user immediately
+  // while the cache write happens in the background.
+  const responseToCache = new Response(JSON.stringify(data), {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "public, s-maxage=604800", // s-maxage is for shared caches (Cloudflare)
+    },
+  });
+
+  context.cloudflare.ctx.waitUntil(cache.put(cacheKey, responseToCache));
+
+  return data;
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -120,14 +152,9 @@ export default function Page({ loaderData }: Route.ComponentProps) {
       <div className="max-w-6xl mx-auto w-full lg:h-full lg:flex lg:flex-col">
         {/* Header Section */}
         <div className="mb-6 px-1">
-          <div className="flex flex-col gap-1 mb-4">
-            <h1 className="text-2xl sm:text-3xl font-bold break-all">
-              {paste.title || "Untitled Paste"}
-            </h1>
-            <p className="text-xs font-mono text-muted-foreground/60">
-              ID: {paste.id}
-            </p>
-          </div>
+          <h1 className="text-xl sm:text-3xl font-bold break-all  mb-4">
+            {paste.title}
+          </h1>
 
           {/* Metadata Grid */}
           <div className="flex flex-wrap gap-x-6 gap-y-2">

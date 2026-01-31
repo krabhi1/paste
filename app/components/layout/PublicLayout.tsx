@@ -8,9 +8,24 @@ import { Separator } from "~/components/ui/separator";
 import { Skeleton } from "~/components/ui/skeleton";
 import { formatRelativeTime } from "~/lib/utils";
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function loader({ context }: Route.LoaderArgs) {
+  const { paste: pasteKV } = context.cloudflare.env;
+  const cacheList = (await pasteKV.get("latest_pastes", { type: "json" })) as
+    | Paste[]
+    | null;
+
+  if (!cacheList) {
+    const latestPastes = await getLatestPastes(10);
+    context.cloudflare.ctx.waitUntil(
+      pasteKV.put("latest_pastes", JSON.stringify(latestPastes)),
+    );
+    return {
+      pasteList: latestPastes,
+    };
+  }
+
   return {
-    pasteList: getLatestPastes(10),
+    pasteList: cacheList || [],
   };
 }
 
@@ -26,11 +41,7 @@ export default function PublicLayout({ loaderData }: Route.ComponentProps) {
       {/* Sidebar: Sticky on desktop, flows below content on mobile */}
       <aside className="w-full lg:w-72 flex-shrink-0 pb-12 lg:pb-0">
         <div className="lg:sticky lg:top-[88px]">
-          <Suspense fallback={<PublicListSkeleton />}>
-            <Await resolve={pasteList}>
-              {(resolvedList) => <PublicList list={resolvedList} />}
-            </Await>
-          </Suspense>
+          <PublicList list={pasteList} />
         </div>
       </aside>
     </div>

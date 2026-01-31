@@ -4,7 +4,7 @@ import { redirect, useFetcher, data } from "react-router";
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Create New Paste | Paste — Minimal Text Sharing" }];
 };
-import { createPaste } from "~/db/queries";
+import { createPaste, getLatestPastes } from "~/db/queries";
 import { PasteSchema } from "~/lib/validations";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -26,7 +26,8 @@ import {
 } from "~/components/ui/card";
 import { Loader2 } from "lucide-react";
 
-export async function action({ request }: Route.ActionArgs) {
+export async function action({ request, context }: Route.ActionArgs) {
+  const { paste: pasteKV } = context.cloudflare.env;
   const formData = await request.formData();
   const submission = PasteSchema.safeParse(Object.fromEntries(formData));
 
@@ -38,6 +39,11 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   const paste = await createPaste(submission.data);
+  const latestFromDb = await getLatestPastes(10);
+
+  context.cloudflare.ctx.waitUntil(
+    pasteKV.put("latest_pastes", JSON.stringify(latestFromDb)),
+  );
   return redirect(`/${paste.id}`);
 }
 

@@ -1,9 +1,6 @@
-# Project Roadmap of Paste
+# TODO list of paste project
 
-## In Progress
-
-## Completed Tasks
-
+- [x] Remote showing ID from paste page
 - [x] UI: remove language chip from search item
 - [x] No horizontal scroll on plain text paste in paste page. Also add wrap toggle icon button.
 
@@ -51,9 +48,7 @@
 - [ ] Search Optimization: Consider adding an index on `createdAt` and `title` to speed up searches as the database grows.
 - [ ] Error Handling: Add `ErrorBoundary` components to handle 404s and unexpected server errors gracefully.
 - [ ] Testing: Expand `vitest` coverage for edge cases in `getExpiryDate` and search filters.
-- [ ] Cache the public pastes page using Cloudflare KV or Workers Cache API for faster load times.
-
-## Final Touches
+- [x] Cache the public pastes page using Cloudflare KV or Workers Cache API for faster load times.
 
 ## Observability
 
