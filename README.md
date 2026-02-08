@@ -1,34 +1,56 @@
 # Paste
+
+A high-performance, edge-native pastebin built on Cloudflare Workers and Turso.
+
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/a37d9a81-5270-41ee-aeda-c5c4c3afcbfd" />
 
+Paste is a minimalist code sharing platform designed for the modern web. It prioritizes speed, developer experience, and privacy by leveraging a globally distributed architecture. By shifting compute and data to the edge, Paste ensures 0ms cold starts and instant content delivery.
 
-This is paste app for sharing text and code snippets quickly and easily.
-I built this because I wanted a simple, clean place to share text and code without any extra noise or bloat. It's designed to be fast, minimal with modern looks.
+## Key Features
 
-### Why use this?
+- **Edge-First Performance**: Built on Cloudflare Workers for sub-100ms global response times.
+- **Type-Safe Persistence**: Powered by Turso (libSQL) and Drizzle ORM for reliable, distributed data.
+- **Minimalist UX**: Fast search, automatic expiration, and a clean, ad-free interface.
+- **Modern DX**: Leverages React Router 7's framework mode and Tailwind CSS 4.
 
-- **Speed**: Built on the edge (Cloudflare Workers) so it loads instantly.
-- **Search**: A quick search that actually works across titles and content.
-- **Privacy**: Set your pastes to expire automatically whenever you want.
-- **Clean**: No tracking, no ads, just your text.
-- **Open Source**: Fully open source so you can see exactly how it works.
+## Documentation
 
-### Getting it running
+To understand the engineering behind the project or to get involved, please refer to our internal documentation:
 
-If you want to run this locally, you'll just need `pnpm`:
+- **[Architecture](./ARCHITECTURE.md)**: System design, data lifecycle, and Architectural Decision Records (ADRs).
+- **[Roadmap](./todo.md)**: Current progress, feature phases, and technical priorities.
+- **[Contributing](./CONTRIBUTING.md)**: Local setup guide, engineering standards, and PR workflows.
+
+## Tech Stack
+
+- **Runtime**: Cloudflare Workers
+- **Framework**: React Router 7 (Framework Mode)
+- **Database**: Turso (libSQL)
+- **ORM**: Drizzle ORM
+- **Styling**: Tailwind CSS 4 + shadcn/ui
+- **Validation**: Zod
+
+## Getting Started
+
+Ensure you have `pnpm` and the `Wrangler` CLI installed.
 
 ```bash
-#setup the .env see .env.example for reference
-#then install deps and run
+# Install dependencies
 pnpm install
+
+# Setup environment variables (refer to .env.example)
+cp .env.example .env
+
+# Synchronize database schema
+pnpm db:generate
+pnpm db:migrate
+
+# Start the development environment
 pnpm dev
 ```
 
-The database uses Turso (SQLite), so make sure you have your environment variables set up if you're planning to deploy it yourself.
+For detailed contribution guidelines and setup troubleshooting, see **[CONTRIBUTING.md](./CONTRIBUTING.md)**.
 
-### Tech
+## License
 
-- React Router 7
-- Cloudflare Workers
-- Turso (Drizzle ORM)
-- Tailwind CSS 4
+MIT License. See [LICENSE](./LICENSE) for details.
