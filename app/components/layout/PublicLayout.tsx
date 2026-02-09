@@ -82,7 +82,7 @@ function PublicList({ list }: { list: Paste[] }) {
         <div className="flex items-center gap-2">
           <FileTextIcon className="w-4 h-4 text-muted-foreground/60" />
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
-            Recent Pastes
+            Recent
           </h3>
         </div>
       </div>

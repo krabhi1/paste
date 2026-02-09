@@ -26,7 +26,7 @@ export const PasteSchema = z.object({
     .string()
     .trim()
     .min(1, "Title is required")
-    .max(100, "Title must be less than 100 characters"),
+    .max(200, "Title must be less than 200 characters"),
   text: z
     .string()
     .min(1, "Content is required")
@@ -36,7 +36,7 @@ export const PasteSchema = z.object({
 });
 
 export const SearchSchema = z.object({
-  q: z.string().max(50, "Search query is too long").optional(),
+  q: z.string().max(200, "Search query is too long").optional(),
 });
 
 export type PasteInput = z.infer<typeof PasteSchema>;
