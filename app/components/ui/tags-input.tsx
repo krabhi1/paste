@@ -42,7 +42,38 @@ export function TagsInput({
   };
   const [pendingValue, setPendingValue] = React.useState("");
   const [isFocused, setIsFocused] = React.useState(false);
+  const [suggestions, setSuggestions] = React.useState<
+    { name: string; normalized: string; count: number }[]
+  >([]);
+  const [activeIndex, setActiveIndex] = React.useState(-1);
+  const [showDropdown, setShowDropdown] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (pendingValue.length < 1) {
+      setSuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/tags?q=${encodeURIComponent(pendingValue)}`,
+        );
+        const data = (await res.json()) as any[];
+        // Filter out tags already added
+        const filtered = data.filter((s: any) => !tags.includes(s.normalized));
+        setSuggestions(filtered);
+        setShowDropdown(filtered.length > 0);
+        setActiveIndex(-1);
+      } catch (err) {
+        console.error("Failed to fetch tags", err);
+      }
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [pendingValue, tags]);
 
   const addTag = (val: string) => {
     const normalized = val
@@ -63,9 +94,28 @@ export function TagsInput({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === "," || e.key === " ") {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (activeIndex >= 0 && suggestions[activeIndex]) {
+        addTag(suggestions[activeIndex].name);
+        setSuggestions([]);
+        setShowDropdown(false);
+      } else {
+        addTag(pendingValue);
+      }
+    } else if (e.key === "," || e.key === " ") {
       e.preventDefault();
       addTag(pendingValue);
+    } else if (e.key === "ArrowDown" && showDropdown) {
+      e.preventDefault();
+      setActiveIndex((prev) =>
+        prev < suggestions.length - 1 ? prev + 1 : prev,
+      );
+    } else if (e.key === "ArrowUp" && showDropdown) {
+      e.preventDefault();
+      setActiveIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    } else if (e.key === "Escape") {
+      setShowDropdown(false);
     } else if (
       e.key === "Backspace" &&
       pendingValue === "" &&
@@ -106,7 +156,7 @@ export function TagsInput({
   };
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-2 relative", className)}>
       <div
         className={cn(
           "flex flex-wrap items-center gap-2 px-3 py-1.5 min-h-9 w-full rounded-md border border-input bg-transparent dark:bg-input/30 text-base md:text-sm transition-[color,box-shadow] outline-none",
@@ -157,6 +207,38 @@ export function TagsInput({
           disabled={tags.length >= maxTags}
         />
       </div>
+
+      {/* Suggestions Dropdown */}
+      {showDropdown && suggestions.length > 0 && isFocused && (
+        <div className="absolute top-[calc(100%+4px)] left-0 w-full z-50 bg-popover text-popover-foreground border rounded-md shadow-md overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
+          <ul className="p-1">
+            {suggestions.map((suggestion, index) => (
+              <li
+                key={suggestion.normalized}
+                className={cn(
+                  "flex items-center justify-between px-2 py-1.5 text-sm rounded-sm cursor-pointer transition-colors",
+                  index === activeIndex
+                    ? "bg-accent text-accent-foreground"
+                    : "hover:bg-accent hover:text-accent-foreground",
+                )}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  addTag(suggestion.name);
+                  setSuggestions([]);
+                  setShowDropdown(false);
+                }}
+                onMouseEnter={() => setActiveIndex(index)}
+              >
+                <span className="font-medium">#{suggestion.name}</span>
+                <span className="text-[10px] opacity-50 uppercase font-bold tracking-tighter">
+                  {suggestion.count}{" "}
+                  {suggestion.count === 1 ? "paste" : "pastes"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Hidden input to store comma-separated tags for form submission */}
       {name && <input type="hidden" name={name} value={tags.join(",")} />}

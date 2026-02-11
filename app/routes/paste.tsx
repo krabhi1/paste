@@ -199,7 +199,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
                 <Link
                   key={tag.id}
                   to={`/search?tags=${tag.normalized}`}
-                  className="no-underline transition-transform hover:scale-105 active:scale-95"
+                  className="no-underline"
                 >
                   <Badge
                     variant="outline"

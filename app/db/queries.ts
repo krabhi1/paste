@@ -317,3 +317,27 @@ export async function getSearchSuggestions(query: string, limit: number = 5) {
     };
   });
 }
+
+/**
+ * Fetches popular tags matching a query string for autocomplete.
+ */
+export async function getSuggestedTags(query: string, limit: number = 8) {
+  const trimmedQuery = query.trim().toLowerCase();
+  if (!trimmedQuery) return [];
+
+  const pattern = `%${trimmedQuery}%`;
+
+  return db()
+    .select({
+      id: tags.id,
+      name: tags.name,
+      normalized: tags.normalized,
+      count: sql<number>`count(${pasteTags.pasteId})`,
+    })
+    .from(tags)
+    .leftJoin(pasteTags, eq(tags.id, pasteTags.tagId))
+    .where(sql`LOWER(${tags.name}) LIKE LOWER(${pattern})`)
+    .groupBy(tags.id)
+    .orderBy(desc(sql`count(${pasteTags.pasteId})`))
+    .limit(limit);
+}

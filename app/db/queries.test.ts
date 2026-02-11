@@ -8,6 +8,7 @@ import {
   getLatestPastes,
   getPasteById,
   searchPastes,
+  getSuggestedTags,
 } from "./queries";
 import { env } from "cloudflare:test";
 function initDb() {
@@ -228,5 +229,29 @@ describe("Database Queries", () => {
     const { results } = await searchPastes({ tags: ["react", "typescript"] });
     expect(results.length).toBe(1);
     expect(results[0].title).toBe("Multi-tag Test");
+  });
+
+  test("Get Suggested Tags (Autocomplete)", async () => {
+    // Seed tags with varying popularity
+    await createPaste({ title: "P1", text: "T", tags: ["react", "rust"] });
+    await createPaste({ title: "P2", text: "T", tags: ["react", "rust"] });
+    await createPaste({ title: "P3", text: "T", tags: ["react"] });
+    await createPaste({ title: "P4", text: "T", tags: ["remix"] });
+
+    // Search for 'r'
+    const results = await getSuggestedTags("r");
+
+    // Should find react, rust, remix
+    expect(results.length).toBeGreaterThanOrEqual(3);
+
+    // Check popularity ordering (react has 3, rust has 2, remix has 1)
+    expect(results[0].normalized).toBe("react");
+    expect(results[1].normalized).toBe("rust");
+    expect(results[2].normalized).toBe("remix");
+
+    // Partial match
+    const specific = await getSuggestedTags("ea");
+    expect(specific).toHaveLength(1);
+    expect(specific[0].normalized).toBe("react");
   });
 });

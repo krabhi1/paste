@@ -8,6 +8,7 @@ import {
 export default [
   route("/raw/:id", "routes/raw.tsx"),
   route("api/search", "routes/api.search.ts"),
+  route("api/tags", "routes/api.tags.ts"),
   layout("components/layout/RootLayout.tsx", [
     layout("components/layout/PublicLayout.tsx", [
       index("routes/home.tsx"),

@@ -426,9 +426,9 @@ export default function SearchPage() {
                               <div className="flex items-center gap-1.5 ml-1">
                                 {paste.tags.slice(0, 3).map((tag: any) => (
                                   <Badge
-                                    key={tag.id}
-                                    variant="secondary"
-                                    className="px-1.5 py-0 text-[9px] font-bold uppercase tracking-tight bg-primary/5 text-primary/70 border-primary/10"
+                                    variant="outline"
+                                    id={`tag-${tag.id}`}
+                                    className="bg-primary/5 text-primary border-primary/20   text-[9px] font-bold uppercase tracking-wider flex items-center gap-1"
                                   >
                                     {tag.name}
                                   </Badge>

@@ -2,16 +2,19 @@ import type { Route } from ".react-router/types/app/components/layout/+types/Pub
 import { Outlet, Link, Await } from "react-router";
 import { Suspense } from "react";
 import { getLatestPastes } from "~/db/queries";
-import type { Paste } from "~/db/schema";
+import type { Paste, Tag } from "~/db/schema";
+
+type PasteWithTags = Paste & { tags: Tag[] };
 import { ClockIcon, FileTextIcon } from "lucide-react";
 import { Separator } from "~/components/ui/separator";
 import { Skeleton } from "~/components/ui/skeleton";
 import { formatRelativeTime } from "~/lib/utils";
+import { Badge } from "../ui/badge";
 
 export async function loader({ context }: Route.LoaderArgs) {
   const { paste: pasteKV } = context.cloudflare.env;
   const cacheList = (await pasteKV.get("latest_pastes", { type: "json" })) as
-    | Paste[]
+    | PasteWithTags[]
     | null;
 
   if (!cacheList) {
@@ -74,7 +77,7 @@ function PublicListSkeleton() {
   );
 }
 
-function PublicList({ list }: { list: Paste[] }) {
+function PublicList({ list }: { list: PasteWithTags[] }) {
   return (
     <div className="flex flex-col bg-card/20 rounded-xl border border-border/40 overflow-hidden">
       {/* Sidebar Header */}
@@ -105,11 +108,23 @@ function PublicList({ list }: { list: Paste[] }) {
                       <p className="text-sm font-semibold text-foreground leading-tight truncate group-hover:text-primary transition-colors">
                         {paste.title || "Untitled Paste"}
                       </p>
-                      <div className="flex items-center gap-2">
-                        <ClockIcon className="w-3 h-3 text-muted-foreground/70" />
-                        <span className="text-[11px] font-medium text-muted-foreground/70">
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <ClockIcon className="w-3 h-3 text-muted-foreground/70 flex-shrink-0" />
+                        <span className="text-[11px] font-medium text-muted-foreground/70 whitespace-nowrap">
                           {formatRelativeTime(paste.createdAt)}
                         </span>
+                        {paste.tags && paste.tags.length > 0 && (
+                          <div className="flex gap-1 overflow-hidden">
+                            {paste.tags.slice(0, 2).map((tag) => (
+                              <Badge
+                                variant="outline"
+                                className="bg-primary/5 text-primary border-primary/20   text-[9px] font-bold uppercase tracking-wider flex items-center gap-1"
+                              >
+                                {tag.name}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
