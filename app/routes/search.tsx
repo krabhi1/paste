@@ -26,11 +26,13 @@ import {
   Search as SearchIcon,
   Inbox,
   Loader2,
+  X,
 } from "lucide-react";
 import { useState, useEffect, useRef, Suspense } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
 import { formatRelativeTime } from "~/lib/utils";
 import { SearchSchema } from "~/lib/validations";
+import { TagsInput } from "~/components/ui/tags-input";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Search Public Pastes | Paste" }];
@@ -39,6 +41,15 @@ export const meta: Route.MetaFunction = () => {
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const q = url.searchParams.get("q") || "";
+
+  // Handle both singular 'tag' and plural 'tags' for backward compatibility
+  const tagParam = url.searchParams.get("tag");
+  const tagsParam = url.searchParams.get("tags");
+  const tags = tagsParam
+    ? tagsParam.split(",").filter(Boolean)
+    : tagParam
+      ? [tagParam]
+      : [];
   const validation = SearchSchema.safeParse({ q });
   const errors = validation.success
     ? null
@@ -59,11 +70,16 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const resultsPromise = errors
     ? Promise.resolve({ results: [], total: 0, page: 1, totalPages: 0 })
-    : searchPastes({ query: q, syntax, from: fromDate }, page, limit);
+    : searchPastes(
+        { query: q, syntax, tags: tags, from: fromDate },
+        page,
+        limit,
+      );
 
   return {
     resultsPromise,
     query: q,
+    activeTags: tags,
     activeSyntax: syntax,
     activeTime: time,
     errors,
@@ -74,6 +90,7 @@ export default function SearchPage() {
   const {
     resultsPromise,
     query: initialQuery,
+    activeTags,
     activeSyntax,
     activeTime,
     errors,
@@ -128,6 +145,10 @@ export default function SearchPage() {
 
   const updateParams = (updates: Record<string, string>) => {
     const newParams = new URLSearchParams(searchParams);
+
+    // Always clean up legacy singular tag param
+    newParams.delete("tag");
+
     Object.entries(updates).forEach(([key, value]) => {
       if (!value || value === "all") newParams.delete(key);
       else newParams.set(key, value);
@@ -316,6 +337,21 @@ export default function SearchPage() {
             </Select>
           </div>
 
+          <div className="flex items-center gap-3 min-w-[300px] flex-1">
+            <label className="text-sm font-semibold text-foreground/80 whitespace-nowrap">
+              Tags
+            </label>
+            <TagsInput
+              value={activeTags}
+              onChange={(tags) =>
+                updateParams({ tags: tags.join(","), page: "1" })
+              }
+              placeholder="Filter by tags..."
+              className="flex-1 space-y-0"
+              maxTags={10}
+            />
+          </div>
+
           <div className="ml-auto">
             <Suspense fallback={<Skeleton className="h-4 w-24" />}>
               <Await resolve={resultsPromise}>
@@ -354,6 +390,8 @@ export default function SearchPage() {
                           q: "",
                           syntax: "all",
                           time: "all",
+                          tags: "",
+                          tag: "",
                           page: "1",
                         });
                       }}
@@ -384,6 +422,24 @@ export default function SearchPage() {
                               <FileCode className="w-3.5 h-3.5" />
                               {(paste.text.length / 1024).toFixed(1)} KB
                             </span>
+                            {paste.tags && paste.tags.length > 0 && (
+                              <div className="flex items-center gap-1.5 ml-1">
+                                {paste.tags.slice(0, 3).map((tag: any) => (
+                                  <Badge
+                                    key={tag.id}
+                                    variant="secondary"
+                                    className="px-1.5 py-0 text-[9px] font-bold uppercase tracking-tight bg-primary/5 text-primary/70 border-primary/10"
+                                  >
+                                    {tag.name}
+                                  </Badge>
+                                ))}
+                                {paste.tags.length > 3 && (
+                                  <span className="text-[9px] opacity-50">
+                                    +{paste.tags.length - 3}
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
 
                           {initialQuery &&

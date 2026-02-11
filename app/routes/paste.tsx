@@ -10,27 +10,29 @@ import {
   Check,
   Share2,
   WrapText,
+  Tag as TagIcon,
 } from "lucide-react";
 import { getPasteById } from "~/db/queries";
 import { useState } from "react";
-import { useFetcher, data } from "react-router";
+import { useFetcher, data, Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/lib/utils";
-import type { Paste } from "~/db/schema";
-import type { P } from "node_modules/react-router/dist/development/register-DiOIlEq5.mjs";
+import type { Paste, Tag } from "~/db/schema";
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  if (!data || !("paste" in data)) {
+  const typedData = data as { paste: Paste & { tags: Tag[] } } | undefined;
+
+  if (!typedData || !typedData.paste) {
     return [{ title: "Paste Not Found | Paste" }];
   }
 
-  const title = data.paste.title || "Untitled Paste";
+  const title = typedData.paste.title || "Untitled Paste";
   const description =
-    data.paste.text.slice(0, 150).replace(/\s+/g, " ").trim() +
-    (data.paste.text.length > 150 ? "..." : "");
+    typedData.paste.text.slice(0, 150).replace(/\s+/g, " ").trim() +
+    (typedData.paste.text.length > 150 ? "..." : "");
 
   return [
     { title: `${title} | Paste` },
@@ -56,7 +58,9 @@ export async function loader({ params, request, context }: Route.LoaderArgs) {
   const cachedResponse = await cache.match(cacheKey);
   if (cachedResponse) {
     console.log("Cache hit:", id);
-    return (await cachedResponse.json()) as { paste: Paste };
+    return (await cachedResponse.json()) as {
+      paste: Paste & { tags: Tag[] };
+    };
   }
   // Fetch from DB
   console.log("Cache miss:", id);
@@ -187,6 +191,27 @@ export default function Page({ loaderData }: Route.ComponentProps) {
               </div>
             )}
           </div>
+
+          {/* Tags Section */}
+          {paste.tags && paste.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-5">
+              {paste.tags.map((tag) => (
+                <Link
+                  key={tag.id}
+                  to={`/search?tags=${tag.normalized}`}
+                  className="no-underline transition-transform hover:scale-105 active:scale-95"
+                >
+                  <Badge
+                    variant="outline"
+                    className="bg-primary/5 text-primary border-primary/20 hover:bg-primary/10 transition-colors px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1"
+                  >
+                    <TagIcon className="w-3 h-3" />
+                    {tag.name}
+                  </Badge>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         <Separator className="mb-6 opacity-50" />

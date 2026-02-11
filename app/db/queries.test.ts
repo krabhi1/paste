@@ -1,6 +1,8 @@
-import { expect, test, describe, beforeAll } from "vitest";
+import { expect, test, describe, beforeAll, beforeEach } from "vitest";
 import { drizzle } from "drizzle-orm/libsql";
-import { type Db, setDb } from "~/db";
+import * as schema from "./schema";
+import { pastes, tags } from "./schema";
+import { type Db, setDb, db } from "~/db";
 import {
   createPaste,
   getLatestPastes,
@@ -14,6 +16,7 @@ function initDb() {
       url: env.TURSO_CONNECTION_URL!,
       authToken: env.TURSO_AUTH_TOKEN!,
     },
+    schema,
   });
   setDb(_db);
 }
@@ -21,6 +24,11 @@ function initDb() {
 describe("Database Queries", () => {
   beforeAll(() => {
     initDb();
+  });
+
+  beforeEach(async () => {
+    await db().delete(pastes);
+    await db().delete(tags);
   });
   // create paste
   test("Create Paste", async () => {
@@ -49,6 +57,14 @@ describe("Database Queries", () => {
   });
   // get latest pastes
   test("Get Latest 5 Pastes", async () => {
+    // Seed 5 pastes
+    for (let i = 0; i < 5; i++) {
+      await createPaste({
+        text: `Content ${i}`,
+        title: `Title ${i}`,
+      });
+    }
+
     const pastes = await getLatestPastes(5);
     expect(pastes.length).toBe(5);
     // check if they are in descending order
@@ -150,5 +166,67 @@ describe("Database Queries", () => {
         ),
       ).toBe(true);
     }
+  });
+
+  test("Create Paste with Tags", async () => {
+    const paste = await createPaste({
+      text: "Code with tags",
+      title: "Tagged Paste",
+      tags: ["react", "typescript", "WEB"],
+    });
+
+    const fetched = await getPasteById(paste.id);
+    expect(fetched?.tags).toHaveLength(3);
+    const tagNames = fetched?.tags.map((t: any) => t.normalized);
+    expect(tagNames).toContain("react");
+    expect(tagNames).toContain("typescript");
+    expect(tagNames).toContain("web"); // normalized
+  });
+
+  test("Search Pastes by Tag", async () => {
+    await createPaste({
+      text: "Specialized content",
+      title: "Tag Search Test",
+      tags: ["unique-tag"],
+    });
+
+    const { results } = await searchPastes({ tags: ["unique-tag"] });
+    expect(results.length).toBeGreaterThan(0);
+    expect(
+      results[0].tags.some((t: any) => t.normalized === "unique-tag"),
+    ).toBe(true);
+  });
+
+  test("Search Pastes by Tag (Case Insensitive)", async () => {
+    await createPaste({
+      text: "Case sensitivity test",
+      title: "Tag Case Test",
+      tags: ["MixedCase"],
+    });
+
+    const { results } = await searchPastes({ tags: ["mixedcase"] });
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0].tags.some((t: any) => t.normalized === "mixedcase")).toBe(
+      true,
+    );
+  });
+
+  test("Search Pastes by Multiple Tags (AND logic)", async () => {
+    await createPaste({
+      text: "Multi-tag content",
+      title: "Multi-tag Test",
+      tags: ["react", "typescript"],
+    });
+
+    await createPaste({
+      text: "Single-tag content",
+      title: "Single-tag Test",
+      tags: ["react"],
+    });
+
+    // Searching for both should only return the first one
+    const { results } = await searchPastes({ tags: ["react", "typescript"] });
+    expect(results.length).toBe(1);
+    expect(results[0].title).toBe("Multi-tag Test");
   });
 });

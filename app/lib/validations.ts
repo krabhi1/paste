@@ -33,6 +33,33 @@ export const PasteSchema = z.object({
     .max(1000000, "Content is too large (max 1MB)"),
   syntax: z.enum(syntaxOptions).default("plaintext"),
   expiry: z.enum(expiryOptions).default("never"),
+  tags: z
+    .preprocess(
+      (val) => {
+        if (typeof val === "string") {
+          if (!val.trim()) return [];
+          return val
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean);
+        }
+        return val;
+      },
+      z.array(
+        z
+          .string()
+          .trim()
+          .min(1, "Tag too short")
+          .max(50, "Tag too long")
+          .regex(
+            /^[a-z0-9-]+$/,
+            "Tags can only contain letters, numbers, and hyphens",
+          )
+          .toLowerCase(),
+      ),
+    )
+    .default([])
+    .transform((tags) => Array.from(new Set(tags)).slice(0, 10)),
 });
 
 export const SearchSchema = z.object({

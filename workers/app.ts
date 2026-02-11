@@ -1,6 +1,7 @@
 import { createRequestHandler } from "react-router";
 import { drizzle } from "drizzle-orm/libsql";
 import { type Db, setDb } from "~/db";
+import * as schema from "~/db/schema";
 
 declare module "react-router" {
   export interface AppLoadContext {
@@ -24,6 +25,7 @@ export default {
         url: env.TURSO_CONNECTION_URL!,
         authToken: env.TURSO_AUTH_TOKEN!,
       },
+      schema,
     });
     setDb(_db);
     return requestHandler(request, {

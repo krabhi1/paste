@@ -25,6 +25,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { TagsInput } from "~/components/ui/tags-input";
 
 export async function action({ request, context }: Route.ActionArgs) {
   const { paste: pasteKV } = context.cloudflare.env;
@@ -115,6 +116,16 @@ export default function Page({}: Route.ComponentProps) {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tags">Tags</Label>
+              <TagsInput
+                name="tags"
+                placeholder="Add tags (e.g. react, tutorial, snippet)..."
+                error={fetcher.data?.errors?.tags?.[0]}
+                maxTags={10}
+              />
             </div>
 
             <div className="space-y-2">

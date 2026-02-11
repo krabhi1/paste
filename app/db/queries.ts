@@ -1,7 +1,19 @@
-import { type Paste, pastes } from "./schema";
+import { type Paste, pastes, tags, pasteTags } from "./schema";
 import { db } from ".";
 import { pasteId } from "~/lib/utils";
-import { eq, desc, sql, or, isNull, gt, and, gte, lte } from "drizzle-orm";
+import {
+  eq,
+  desc,
+  sql,
+  or,
+  isNull,
+  gt,
+  and,
+  gte,
+  lte,
+  inArray,
+  exists,
+} from "drizzle-orm";
 
 /**
  * Calculates the expiration date based on the user's selection.
@@ -34,6 +46,7 @@ export async function createPaste(args: {
   title: string;
   syntax?: string;
   expiry?: string;
+  tags?: string[];
 }) {
   let success = false;
   const expiresAt = args.expiry ? getExpiryDate(args.expiry) : null;
@@ -41,17 +54,45 @@ export async function createPaste(args: {
   while (!success) {
     const id = pasteId();
     try {
-      const paste = await db()
-        .insert(pastes)
-        .values({
-          id,
-          text: args.text,
-          title: args.title,
-          syntax: args.syntax || "plaintext",
-          expiresAt: expiresAt,
-        })
-        .returning();
-      return paste[0];
+      return await db().transaction(async (tx) => {
+        const paste = await tx
+          .insert(pastes)
+          .values({
+            id,
+            text: args.text,
+            title: args.title,
+            syntax: args.syntax || "plaintext",
+            expiresAt: expiresAt,
+          })
+          .returning();
+
+        const createdPaste = paste[0];
+
+        if (args.tags && args.tags.length > 0) {
+          for (const tagName of args.tags) {
+            const normalized = tagName.toLowerCase();
+            // Upsert tag
+            const tagResults = await tx
+              .insert(tags)
+              .values({ name: tagName, normalized })
+              .onConflictDoUpdate({
+                target: tags.normalized,
+                set: { name: tagName },
+              })
+              .returning();
+
+            const tag = tagResults[0];
+
+            // Link tag
+            await tx.insert(pasteTags).values({
+              pasteId: createdPaste.id,
+              tagId: tag.id,
+            });
+          }
+        }
+
+        return createdPaste;
+      });
     } catch (e) {
       if (
         e instanceof Error &&
@@ -66,38 +107,70 @@ export async function createPaste(args: {
 }
 
 export async function getPasteById(id: string) {
-  const pasteList = await db()
-    .select()
-    .from(pastes)
-    .where(and(eq(pastes.id, id), notExpired()))
-    .limit(1);
+  const paste = await db().query.pastes.findFirst({
+    where: and(eq(pastes.id, id), notExpired()),
+    with: {
+      pasteTags: {
+        with: {
+          tag: true,
+        },
+      },
+    },
+  });
 
-  if (pasteList.length === 0) return null;
-  return pasteList[0];
+  if (!paste) return null;
+
+  return {
+    ...paste,
+    tags: paste.pasteTags.map((pt) => pt.tag),
+  };
 }
 
 export async function getLatestPastes(limit: number) {
-  return db()
-    .select()
-    .from(pastes)
-    .where(notExpired())
-    .orderBy(desc(pastes.createdAt))
-    .limit(limit);
+  const results = await db().query.pastes.findMany({
+    where: notExpired(),
+    orderBy: desc(pastes.createdAt),
+    limit: limit,
+    with: {
+      pasteTags: {
+        with: {
+          tag: true,
+        },
+      },
+    },
+  });
+
+  return results.map((p) => ({
+    ...p,
+    tags: p.pasteTags.map((pt) => pt.tag),
+  }));
 }
 
 export async function getLatestPastesByPage(page: number, limit: number) {
-  return db()
-    .select()
-    .from(pastes)
-    .where(notExpired())
-    .orderBy(desc(pastes.createdAt))
-    .limit(limit)
-    .offset((page - 1) * limit);
+  const results = await db().query.pastes.findMany({
+    where: notExpired(),
+    orderBy: desc(pastes.createdAt),
+    limit: limit,
+    offset: (page - 1) * limit,
+    with: {
+      pasteTags: {
+        with: {
+          tag: true,
+        },
+      },
+    },
+  });
+
+  return results.map((p) => ({
+    ...p,
+    tags: p.pasteTags.map((pt) => pt.tag),
+  }));
 }
 
 export interface SearchFilters {
   query?: string;
   syntax?: string;
+  tags?: string[];
   from?: Date;
   to?: Date;
 }
@@ -111,6 +184,19 @@ export async function searchPastes(
   limit: number = 10,
 ) {
   const conditions = [notExpired()];
+
+  if (filters.tags && filters.tags.length > 0) {
+    const normalizedTags = filters.tags.map((t) => t.toLowerCase());
+    const tagSubquery = db()
+      .select({ id: pasteTags.pasteId })
+      .from(pasteTags)
+      .innerJoin(tags, eq(pasteTags.tagId, tags.id))
+      .where(inArray(tags.normalized, normalizedTags))
+      .groupBy(pasteTags.pasteId)
+      .having(sql`count(${pasteTags.tagId}) = ${normalizedTags.length}`);
+
+    conditions.push(inArray(pastes.id, tagSubquery));
+  }
 
   if (filters.query?.trim()) {
     const pattern = `%${filters.query.trim()}%`;
@@ -141,13 +227,19 @@ export async function searchPastes(
   const whereClause = and(...conditions);
 
   const [results, total] = await Promise.all([
-    db()
-      .select()
-      .from(pastes)
-      .where(whereClause)
-      .orderBy(desc(pastes.createdAt))
-      .limit(limit)
-      .offset((page - 1) * limit),
+    db().query.pastes.findMany({
+      where: whereClause,
+      orderBy: desc(pastes.createdAt),
+      limit: limit,
+      offset: (page - 1) * limit,
+      with: {
+        pasteTags: {
+          with: {
+            tag: true,
+          },
+        },
+      },
+    }),
     db()
       .select({ count: sql<number>`count(*)` })
       .from(pastes)
@@ -157,7 +249,10 @@ export async function searchPastes(
   const count = total[0]?.count || 0;
 
   return {
-    results,
+    results: results.map((p) => ({
+      ...p,
+      tags: p.pasteTags.map((pt) => pt.tag),
+    })),
     total: count,
     page,
     totalPages: Math.ceil(count / limit),

@@ -18,8 +18,8 @@ _Goal: Provide professional-grade code reading and sharing tools._
 
 - [ ] **[P0] Syntax Highlighting**: Transition to Shiki (Server-side) with KV caching of HTML output to minimize Worker compute costs.
 - [ ] **[P1] Line Numbers**: Add CSS-based line numbering to code views for better referencing.
-- [ ] **[P1] Raw View**: Proper `Content-Type: text/plain` and `Content-Disposition` headers for raw snippet access.
-- [ ] **[P2] View Count**: Implementation of a view counter using `ctx.waitUntil` to prevent increment logic from blocking the main response.
+- [x] **[P1] Tags**: Allow users to add optional tags to pastes for categorization and improved searchability.
+- [ ] **[P2] View Count**: Implementation of a view counter
 
 ## Phase 3: Privacy & Security
 
