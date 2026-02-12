@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const syntaxOptions = [
   "plaintext",
+  "markdown",
   "cpp",
   "java",
   "javascript",

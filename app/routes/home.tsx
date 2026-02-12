@@ -98,12 +98,13 @@ export default function Page({}: Route.ComponentProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="syntax">Syntax Highlighting</Label>
-                <Select name="syntax" defaultValue="plaintext">
+                <Select name="syntax" defaultValue="markdown">
                   <SelectTrigger id="syntax">
                     <SelectValue placeholder="Select Language" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="plaintext">Plain Text</SelectItem>
+                    <SelectItem value="markdown">Markdown</SelectItem>
                     <SelectItem value="cpp">C++</SelectItem>
                     <SelectItem value="java">Java</SelectItem>
                     <SelectItem value="javascript">JavaScript</SelectItem>

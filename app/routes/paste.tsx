@@ -13,6 +13,7 @@ import {
   Tag as TagIcon,
 } from "lucide-react";
 import { getPasteById } from "~/db/queries";
+import { renderMarkdown } from "~/lib/markdown.server";
 import { useState } from "react";
 import { useFetcher, data, Link } from "react-router";
 import { Button } from "~/components/ui/button";
@@ -23,7 +24,9 @@ import { cn } from "~/lib/utils";
 import type { Paste, Tag } from "~/db/schema";
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  const typedData = data as { paste: Paste & { tags: Tag[] } } | undefined;
+  const typedData = data as
+    | { paste: Paste & { tags: Tag[] }; markdownHtml?: string }
+    | undefined;
 
   if (!typedData || !typedData.paste) {
     return [{ title: "Paste Not Found | Paste" }];
@@ -57,18 +60,27 @@ export async function loader({ params, request, context }: Route.LoaderArgs) {
   //  Check Cache
   const cachedResponse = await cache.match(cacheKey);
   if (cachedResponse) {
-    console.log("Cache hit:", id);
-    return (await cachedResponse.json()) as {
+    const cachedData = (await cachedResponse.json()) as {
       paste: Paste & { tags: Tag[] };
+      markdownHtml?: string;
     };
+    // If it's markdown but HTML is missing (stale cache), continue to generate it
+    if (cachedData.paste.syntax !== "markdown" || cachedData.markdownHtml) {
+      return cachedData;
+    }
   }
   // Fetch from DB
-  console.log("Cache miss:", id);
   const paste = await getPasteById(id!);
   if (!paste) {
     throw new Response("Not Found", { status: 404 });
   }
-  const data = { paste };
+
+  let markdownHtml: string | undefined;
+  if (paste.syntax === "markdown") {
+    markdownHtml = await renderMarkdown(paste.text);
+  }
+
+  const data = { paste, markdownHtml };
 
   // Background Cache Write
   // We use waitUntil so the response is sent to the user immediately
@@ -99,10 +111,13 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function Page({ loaderData }: Route.ComponentProps) {
-  const { paste } = loaderData;
+  const { paste, markdownHtml } = loaderData;
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
   const [isWrapped, setIsWrapped] = useState(paste.syntax === "plaintext");
+  const [viewMode, setViewMode] = useState<"code" | "preview">(
+    paste.syntax === "markdown" ? "preview" : "code",
+  );
   const fetcher = useFetcher();
 
   const isReported = fetcher.data?.success;
@@ -219,13 +234,40 @@ export default function Page({ loaderData }: Route.ComponentProps) {
         {/* Code View with Toolbar */}
         <Card className="lg:flex-grow lg:flex lg:flex-col lg:min-h-0 py-3">
           <CardHeader className="flex flex-row items-center justify-between [.border-b]:pb-3  px-3 sm:px-4 border-b bg-card/50">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Badge
                 variant="secondary"
                 className="text-[10px] uppercase font-bold tracking-wider"
               >
                 {paste.syntax || "plaintext"}
               </Badge>
+
+              {paste.syntax === "markdown" && (
+                <div className="flex items-center bg-muted rounded-md p-0.5 border border-border/50">
+                  <button
+                    onClick={() => setViewMode("code")}
+                    className={cn(
+                      "px-2 py-1 text-[10px] font-bold uppercase tracking-tight rounded-sm transition-all",
+                      viewMode === "code"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    Text
+                  </button>
+                  <button
+                    onClick={() => setViewMode("preview")}
+                    className={cn(
+                      "px-2 py-1 text-[10px] font-bold uppercase tracking-tight rounded-sm transition-all",
+                      viewMode === "preview"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    Preview
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-1 sm:gap-2">
@@ -318,16 +360,27 @@ export default function Page({ loaderData }: Route.ComponentProps) {
           </CardHeader>
 
           <CardContent className="lg:flex-grow p-0 bg-card/30 max-h-[70vh] overflow-y-auto">
-            <pre
-              className={cn(
-                "p-4 sm:p-6 font-mono text-sm leading-relaxed text-foreground bg-transparent border-none m-0 selection:bg-primary/20",
-                isWrapped
-                  ? "whitespace-pre-wrap break-words"
-                  : "whitespace-pre overflow-x-auto",
-              )}
-            >
-              {paste.text}
-            </pre>
+            {viewMode === "preview" && markdownHtml ? (
+              <div
+                className="p-4 sm:p-8 prose prose-sm sm:prose-base dark:prose-invert max-w-none 
+                prose-headings:font-bold prose-headings:tracking-tight
+                prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded-sm prose-code:before:content-none prose-code:after:content-none
+                prose-pre:bg-muted/50 prose-pre:border"
+                dangerouslySetInnerHTML={{ __html: markdownHtml }}
+              />
+            ) : (
+              <pre
+                className={cn(
+                  "p-4 sm:p-6 font-mono text-sm leading-relaxed text-foreground bg-transparent border-none m-0 selection:bg-primary/20",
+                  isWrapped
+                    ? "whitespace-pre-wrap break-words"
+                    : "whitespace-pre overflow-x-auto",
+                )}
+              >
+                {paste.text}
+              </pre>
+            )}
           </CardContent>
         </Card>
       </div>

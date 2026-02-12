@@ -49,6 +49,14 @@ pnpm db:migrate
 pnpm dev
 ```
 
+## Useful commands
+
+```bash
+# create new drizzle migration file
+drizzle-kit generate --custom --name=<name>
+
+```
+
 For detailed contribution guidelines and setup troubleshooting, see **[CONTRIBUTING.md](./CONTRIBUTING.md)**.
 
 ## License
