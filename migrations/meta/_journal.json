@@ -36,6 +36,13 @@
       "when": 1770825316669,
       "tag": "0004_strange_stryfe",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1770903708483,
+      "tag": "0005_migrate_plaintext_to_markdown",
+      "breakpoints": true
     }
   ]
 }
