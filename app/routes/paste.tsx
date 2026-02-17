@@ -171,7 +171,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
       <div className="max-w-6xl mx-auto w-full lg:h-full lg:flex lg:flex-col">
         {/* Header Section */}
         <div className="mb-6 px-1">
-          <h1 className="text-xl sm:text-3xl font-bold break-all  mb-4">
+          <h1 className="text-xl sm:text-3xl font-bold break-words  mb-4">
             {paste.title}
           </h1>
 
@@ -233,8 +233,8 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 
         {/* Code View with Toolbar */}
         <Card className="lg:flex-grow lg:flex lg:flex-col lg:min-h-0 py-3">
-          <CardHeader className="flex flex-row items-center justify-between [.border-b]:pb-3  px-3 sm:px-4 border-b bg-card/50">
-            <div className="flex items-center gap-3">
+          <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between [.border-b]:pb-3  px-3 sm:px-4 border-b bg-card/50">
+            <div className="flex justify-between w-full md:w-fit gap-3">
               <Badge
                 variant="secondary"
                 className="text-[10px] uppercase font-bold tracking-wider"
@@ -270,7 +270,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
               )}
             </div>
 
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-2">
               {/* Copy Content */}
               <Button
                 variant="ghost"
@@ -362,7 +362,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
           <CardContent className="lg:flex-grow p-0 bg-card/30 max-h-[70vh] overflow-y-auto">
             {viewMode === "preview" && markdownHtml ? (
               <div
-                className="p-4 sm:p-8 prose prose-sm sm:prose-base dark:prose-invert max-w-none 
+                className="p-4 sm:p-8 prose prose-sm sm:prose-base dark:prose-invert max-w-none
                 prose-headings:font-bold prose-headings:tracking-tight
                 prose-a:text-primary prose-a:no-underline hover:prose-a:underline
                 prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded-sm prose-code:before:content-none prose-code:after:content-none
