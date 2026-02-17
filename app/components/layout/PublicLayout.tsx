@@ -117,6 +117,7 @@ function PublicList({ list }: { list: PasteWithTags[] }) {
                           <div className="flex gap-1 overflow-hidden">
                             {paste.tags.slice(0, 2).map((tag) => (
                               <Badge
+                                key={tag.id}
                                 variant="outline"
                                 className="bg-primary/5 text-primary border-primary/20   text-[9px] font-bold uppercase tracking-wider flex items-center gap-1"
                               >

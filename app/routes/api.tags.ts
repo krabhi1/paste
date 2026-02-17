@@ -3,12 +3,7 @@ import { getSuggestedTags } from "~/db/queries";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const q = url.searchParams.get("q");
-
-  // Don't search for empty or extremely short strings to keep things snappy
-  if (!q || q.trim().length < 1) {
-    return [];
-  }
+  const q = url.searchParams.get("q") || "";
 
   try {
     const suggestions = await getSuggestedTags(q.trim());

@@ -323,11 +323,8 @@ export async function getSearchSuggestions(query: string, limit: number = 5) {
  */
 export async function getSuggestedTags(query: string, limit: number = 8) {
   const trimmedQuery = query.trim().toLowerCase();
-  if (!trimmedQuery) return [];
 
-  const pattern = `%${trimmedQuery}%`;
-
-  return db()
+  let qb = db()
     .select({
       id: tags.id,
       name: tags.name,
@@ -336,7 +333,14 @@ export async function getSuggestedTags(query: string, limit: number = 8) {
     })
     .from(tags)
     .leftJoin(pasteTags, eq(tags.id, pasteTags.tagId))
-    .where(sql`LOWER(${tags.name}) LIKE LOWER(${pattern})`)
+    .$dynamic();
+
+  if (trimmedQuery) {
+    const pattern = `%${trimmedQuery}%`;
+    qb = qb.where(sql`LOWER(${tags.name}) LIKE LOWER(${pattern})`);
+  }
+
+  return qb
     .groupBy(tags.id)
     .orderBy(desc(sql`count(${pasteTags.pasteId})`))
     .limit(limit);

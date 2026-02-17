@@ -12,7 +12,7 @@ export default function RootHeader() {
         {/* Left Section: Logo */}
         <Link to="/" className="no-underline text-foreground shrink-0">
           <div className="flex items-center gap-2">
-            <img src="/favicon.svg" alt="" className="w-5 h-5" />
+            {/*<img src="/favicon.svg" alt="" className="w-5 h-5" />*/}
             <span className="text-xl font-bold tracking-tight">Paste</span>
           </div>
         </Link>

@@ -50,8 +50,7 @@ export function TagsInput({
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    if (pendingValue.length < 1) {
-      setSuggestions([]);
+    if (!isFocused) {
       setShowDropdown(false);
       return;
     }
@@ -73,7 +72,7 @@ export function TagsInput({
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [pendingValue, tags]);
+  }, [pendingValue, tags, isFocused]);
 
   const addTag = (val: string) => {
     const normalized = val
@@ -194,7 +193,10 @@ export function TagsInput({
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
-          onFocus={() => setIsFocused(true)}
+          onFocus={() => {
+            setIsFocused(true);
+            setShowDropdown(true);
+          }}
           onBlur={() => {
             setIsFocused(false);
             if (pendingValue) addTag(pendingValue);
@@ -211,6 +213,9 @@ export function TagsInput({
       {/* Suggestions Dropdown */}
       {showDropdown && suggestions.length > 0 && isFocused && (
         <div className="absolute top-[calc(100%+4px)] left-0 w-full z-50 bg-popover text-popover-foreground border rounded-md shadow-md overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="px-2 pt-2 pb-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider border-b/50 border-b mb-1">
+            {pendingValue ? "Suggestions" : "Popular Tags"}
+          </div>
           <ul className="p-1">
             {suggestions.map((suggestion, index) => (
               <li
